@@ -19,8 +19,8 @@ export function setupApp() {
             } else {
                 callback(new Error('Not allowed by CORS'))
             }
-        },
-        credentials: true
+        }
+        // credentials: true
     }
     app.use(cors(corsOptions as any))
     app.use(cookieParser())

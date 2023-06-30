@@ -1,12 +1,13 @@
 import Graph from 'react-graph-vis'
 import { useContext } from 'react'
 import { appContext } from '../context'
-import { ID, IEvent } from '../helpers/interfaces'
-import { randomInteger } from '../helpers/utils'
+import { ID, IHoverEvent, ISelectEvent } from '../helpers/interfaces'
+import dayjs from 'dayjs'
+import axios from 'axios'
 
 const options = {
     physics: {
-        stabilization: false,
+        stabilization: true,
         wind: { x: 0, y: 0 }
     },
     layout: {
@@ -25,18 +26,27 @@ const options = {
     edges: {
         color: '#666666',
         smooth: {
-            enabled: true,
-            type: 'cubicBezier'
+            enabled: true
+            // type: 'cubicBezier'
+        },
+        arrows: {
+            to: {
+                enabled: false
+            }
         }
     },
-    height: window.innerHeight.toString()
+    height: window.innerHeight.toString(),
+    interaction: {
+        hover: true
+    }
 }
 
 export default function MyGraph() {
     const {
         nodesState: [nodes, setNodes],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
-        edgesState: [edges, setEdges]
+        edgesState: [edges, setEdges],
+        hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId]
     } = useContext(appContext)
 
     function updateConnection(to: ID) {
@@ -49,15 +59,34 @@ export default function MyGraph() {
 
             // If connection already exists delete it otherwise create
             if (connection) {
-                setEdges(edges.filter(({ id }) => id !== connection.id))
+                axios
+                    .delete(`/api/connections/${connection.id}`)
+                    .then((response) => {
+                        // Upon successful deletion, remove from edges state
+                        setEdges(edges.filter(({ id }) => id !== connection.id))
+                    })
+                    .catch((error) => {
+                        console.error('Failed to delete connection:', error)
+                    })
             } else {
-                setEdges([...edges, { id: randomInteger(0, 20000), from: selectedNodeId, to }])
+                const newConnection = { from: selectedNodeId, to }
+                axios
+                    .post('/api/connections', newConnection)
+                    .then((response) => {
+                        const { _id, ...rest } = response.data
+
+                        // Upon successful creation, add to edges state
+                        setEdges([...edges, { id: _id, ...rest }])
+                    })
+                    .catch((error) => {
+                        console.error('Failed to create connection:', error)
+                    })
             }
         }
     }
 
     const events = {
-        select: function ({ nodes, edges, event }: IEvent) {
+        select: function ({ nodes, edges, event }: ISelectEvent) {
             if (!nodes.length) {
                 setSelectedNodeId(null)
                 return
@@ -68,17 +97,47 @@ export default function MyGraph() {
             }
 
             setSelectedNodeId(nodes[0])
+        },
+        hoverNode: function ({ node }: IHoverEvent) {
+            setHoveredNodeId(node)
+        },
+        blurNode: function ({ node }: IHoverEvent) {
+            setHoveredNodeId(null)
         }
     }
 
     return (
-        <Graph
-            graph={{
-                nodes,
-                edges
-            }}
-            options={options}
-            events={events}
-        />
+        <div className="graph-container">
+            <Graph
+                id="myGraph"
+                graph={{
+                    nodes: nodes.map((node) => {
+                        if (node.title) {
+                            node.label =
+                                node.title +
+                                (node.startDate
+                                    ? '\n' +
+                                      dayjs(node.startDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString() +
+                                      (node.endDate
+                                          ? ' - ' + dayjs(node.endDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString()
+                                          : '')
+                                    : '')
+                        }
+                        if (node.image) {
+                            node.shape = 'circularImage'
+                        }
+
+                        return {
+                            ...node,
+                            title: node.description,
+                            font: { color: node.color }
+                        }
+                    }),
+                    edges
+                }}
+                options={options}
+                events={events}
+            />
+        </div>
     )
 }

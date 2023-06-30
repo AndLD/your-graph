@@ -11,11 +11,33 @@
 }
 
 .form-container {
-    position: absolute;
+    background: white;
+    position: fixed;
+    z-index: 2 !important;
     top: 0;
     left: 50;
     width: 300px;
     padding: 50px;
     margin: 50px;
     box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
+}
+
+.graph-container {
+    z-index: 1 !important;
+}
+
+.image-container {
+    position: absolute;
+    z-index: 2 !important;
+    right: 50px;
+    bottom: 50px;
+    text-align: right;
+    width: 300px;
+    height: 300px;
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
+    }
 }
