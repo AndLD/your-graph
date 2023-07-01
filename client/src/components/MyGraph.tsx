@@ -126,11 +126,18 @@ export default function MyGraph() {
                         if (node.image) {
                             node.shape = 'circularImage'
                         }
+                        // if (node.color && node.color === '#000000') {
+                        //     node.color = { border: '#22222', background: '#666666' }
+                        // }
+
+                        const connections = edges.filter((edge) => edge.from === node.id || edge.to === node.id)
 
                         return {
                             ...node,
                             title: node.description,
-                            font: { color: node.color }
+                            font: { color: node.color },
+                            border: node.image ? 4 : 2,
+                            size: node.image ? 20 + connections.length * 1.5 : 15 + connections.length * 1.5
                         }
                     }),
                     edges

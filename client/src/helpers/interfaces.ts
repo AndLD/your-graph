@@ -32,7 +32,7 @@ export interface INode {
     endDate?: Dayjs | string | null
     tags?: string[]
     image?: string
-    color?: string
+    color?: string | { border: string; background: string }
 
     group?: string
     shape?: string

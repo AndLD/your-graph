@@ -36,7 +36,7 @@ export default function UpdateNodeForm() {
                     id: selectedNode.id,
                     title: selectedNode.title,
                     description: selectedNode.description,
-                    color: selectedNode.color || '#000000',
+                    color: selectedNode.color,
                     tags: selectedNode.tags,
                     startDate: selectedNode.startDate ? dayjs(selectedNode.startDate, 'DD.MM.YYYY') : undefined,
                     endDate: selectedNode.endDate ? dayjs(selectedNode.endDate, 'DD.MM.YYYY') : undefined
@@ -150,7 +150,6 @@ export default function UpdateNodeForm() {
             .delete(`http://localhost:8080/api/nodes/${selectedNodeId}`)
             .then((response) => {
                 // Handle successful deletion
-
                 successMessage()
 
                 // Remove the deleted node from nodes state
@@ -196,11 +195,14 @@ export default function UpdateNodeForm() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Form.Item name="startDate" style={{ width: '47%' }}>
-                        <DatePicker placeholder="Start" />
+                        <DatePicker placeholder="Start" format="DD.MM.YYYY" />
                     </Form.Item>
 
-                    <Form.Item name="endDate" style={{ width: '47%' }}>
-                        <DatePicker placeholder="End" />
+                    <Form.Item
+                        name="endDate"
+                        style={{ width: '47%', opacity: form.getFieldValue('startDate') ? 1 : 0 }}
+                    >
+                        <DatePicker placeholder="End" format="DD.MM.YYYY" />
                     </Form.Item>
                 </div>
 
