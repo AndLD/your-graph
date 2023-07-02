@@ -46,6 +46,12 @@ export default function UpdateNodeForm() {
                 }
                 form.setFieldsValue(newFieldsValue)
             }
+
+            window.addEventListener('keydown', handleKeyDown)
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
         }
     }, [selectedNodeId])
 
@@ -164,6 +170,12 @@ export default function UpdateNodeForm() {
                 errorMessage('Failed to delete node:' + error)
                 console.error('Failed to delete node:', error)
             })
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Delete' && selectedNodeId) {
+            deleteNode()
+        }
     }
 
     return (

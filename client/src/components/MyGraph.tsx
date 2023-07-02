@@ -1,53 +1,56 @@
 import Graph from 'react-graph-vis'
-import { useContext } from 'react'
+import { useCallback, useContext } from 'react'
 import { appContext } from '../context'
-import { ID, IHoverEvent, ISelectEvent } from '../helpers/interfaces'
+import { ID, IHoverEvent, INode, ISelectEvent, IStabilizedEvent } from '../helpers/interfaces'
 import dayjs from 'dayjs'
 import axios from 'axios'
-
-const options = {
-    physics: {
-        stabilization: true,
-        wind: { x: 0, y: 0 }
-    },
-    layout: {
-        hierarchical: false
-    },
-    nodes: {
-        borderWidth: 4,
-        size: 30,
-        shape: 'dot',
-        color: {
-            border: '#222222',
-            background: '#666666'
-        },
-        font: { color: '#666666' }
-    },
-    edges: {
-        color: '#666666',
-        smooth: {
-            enabled: true
-            // type: 'cubicBezier'
-        },
-        arrows: {
-            to: {
-                enabled: false
-            }
-        }
-    },
-    height: window.innerHeight.toString(),
-    interaction: {
-        hover: true
-    }
-}
+import { Utils } from '../helpers/utils'
 
 export default function MyGraph() {
     const {
         nodesState: [nodes, setNodes],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
         edgesState: [edges, setEdges],
-        hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId]
+        hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId],
+        hierarchicalEnabledState: [hierarchicalEnabled, setHierarchinalEnabled],
+        networkState: [network, setNetwork]
     } = useContext(appContext)
+
+    const options = {
+        physics: {
+            stabilization: true,
+            wind: { x: 0, y: 0 }
+        },
+        layout: {
+            hierarchical: hierarchicalEnabled
+        },
+        nodes: {
+            borderWidth: 4,
+            size: 30,
+            shape: 'dot',
+            color: {
+                border: '#222222',
+                background: '#666666'
+            },
+            font: { color: '#666666' }
+        },
+        edges: {
+            color: '#666666',
+            smooth: {
+                enabled: true
+                // type: 'cubicBezier'
+            },
+            arrows: {
+                to: {
+                    enabled: true
+                }
+            }
+        },
+        height: window.innerHeight.toString(),
+        interaction: {
+            hover: !hierarchicalEnabled
+        }
+    }
 
     function updateConnection(to: ID) {
         // Selected node exists and it was not selected twice
@@ -85,6 +88,29 @@ export default function MyGraph() {
         }
     }
 
+    const stabilizedCallback = useCallback(
+        async function ({ iterations }: IStabilizedEvent) {
+            if (iterations > 100) {
+                const nodesObject = network.body.nodes
+
+                const body = Object.keys(nodesObject)
+                    .filter((id: string) => !id.includes('edgeId'))
+                    .map((id: string) => ({
+                        _id: id,
+                        x: nodesObject[id].x,
+                        y: nodesObject[id].y
+                    }))
+
+                console.log(body)
+
+                const response = await axios.put('/api/nodes', body)
+
+                console.log(response.data)
+            }
+        },
+        [nodes]
+    )
+
     const events = {
         select: function ({ nodes, edges, event }: ISelectEvent) {
             if (!nodes.length) {
@@ -101,9 +127,17 @@ export default function MyGraph() {
         hoverNode: function ({ node }: IHoverEvent) {
             setHoveredNodeId(node)
         },
-        blurNode: function ({ node }: IHoverEvent) {
+        blurNode: function () {
             setHoveredNodeId(null)
-        }
+        },
+        dragStart: function ({ nodes }: ISelectEvent) {
+            if (nodes.length) {
+                const nodeId = nodes[0]
+
+                setSelectedNodeId(nodeId)
+            }
+        },
+        stabilized: stabilizedCallback
     }
 
     return (
@@ -113,22 +147,11 @@ export default function MyGraph() {
                 graph={{
                     nodes: nodes.map((node) => {
                         if (node.title) {
-                            node.label =
-                                node.title +
-                                (node.startDate
-                                    ? '\n' +
-                                      dayjs(node.startDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString() +
-                                      (node.endDate
-                                          ? ' - ' + dayjs(node.endDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString()
-                                          : '')
-                                    : '')
+                            node.label = Utils.getNodeLabel(node)
                         }
                         if (node.image) {
                             node.shape = 'circularImage'
                         }
-                        // if (node.color && node.color === '#000000') {
-                        //     node.color = { border: '#22222', background: '#666666' }
-                        // }
 
                         const connections = edges.filter((edge) => edge.from === node.id || edge.to === node.id)
 
@@ -144,6 +167,7 @@ export default function MyGraph() {
                 }}
                 options={options}
                 events={events}
+                getNetwork={setNetwork}
             />
         </div>
     )

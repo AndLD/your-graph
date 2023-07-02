@@ -61,3 +61,7 @@ export interface ISelectEvent {
 export interface IHoverEvent {
     node: string
 }
+
+export interface IStabilizedEvent {
+    iterations: number
+}

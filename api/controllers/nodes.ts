@@ -17,6 +17,8 @@ async function get(req: Request, res: Response, next: NextFunction) {
 
 async function post(req: Request, res: Response, next: NextFunction) {
     try {
+        const selectedNodeId = req.query.selectedNodeId
+
         if (req.body.tags) {
             req.body.tags = JSON.parse(req.body.tags)
         }
@@ -31,10 +33,30 @@ async function post(req: Request, res: Response, next: NextFunction) {
             data._id = new ObjectId(req.body._id)
         }
 
-        const result = await db.collection('nodes').insertOne(data)
+        let result = await db.collection('nodes').insertOne(data)
 
-        if (result.acknowledged) {
-            return res.json(req.body)
+        if (result.insertedId) {
+            const resBody: any = {
+                node: {
+                    ...req.body,
+                    _id: result.insertedId
+                }
+            }
+
+            if (selectedNodeId) {
+                const connection = { from: selectedNodeId, to: result.insertedId.toString() }
+
+                result = await db.collection('connections').insertOne(connection)
+
+                if (result.insertedId) {
+                    resBody.connection = {
+                        ...connection,
+                        _id: result.insertedId
+                    }
+                }
+            }
+
+            return res.json(resBody)
         } else {
             throw new ErrorHandler(500, 'Failed to insert data into MongoDB.')
         }
@@ -90,6 +112,26 @@ async function put(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+async function putPositions(req: Request, res: Response, next: NextFunction) {
+    try {
+        const bulkWriteOptions = req.body.map(({ _id, ...rest }: { _id: string; x: number; y: number }) => ({
+            updateOne: { filter: { _id: new ObjectId(_id) }, update: { $set: rest } }
+        }))
+
+        const result = await db.collection('nodes').bulkWrite(bulkWriteOptions)
+
+        if (result.matchedCount === 0) {
+            throw new ErrorHandler(404, 'No one node found')
+        } else if (result.modifiedCount === 0) {
+            throw new ErrorHandler(400, 'No one node modified')
+        }
+
+        res.end()
+    } catch (err) {
+        next(err)
+    }
+}
+
 async function deleteOne(req: Request, res: Response, next: NextFunction) {
     try {
         const { id } = req.params
@@ -137,5 +179,6 @@ export const nodesControllers = {
     get,
     post,
     put,
+    putPositions,
     deleteOne
 }

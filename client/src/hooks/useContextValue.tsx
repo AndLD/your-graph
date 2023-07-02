@@ -10,6 +10,10 @@ export default function useContextValue() {
     const nodesState = useState<INode[]>([])
     const edgesState = useState<IConnection[]>([])
 
+    const hierarchicalEnabledState = useState(false)
+
+    const networkState = useState<any>(null)
+
     useEffect(() => {
         // Fetch nodes from the server
         axios
@@ -55,10 +59,23 @@ export default function useContextValue() {
             })
     }, [])
 
+    function selectNode(nodeId: string, focus = false) {
+        networkState[0].selectNodes([nodeId])
+
+        if (focus) {
+            networkState[0].focus(nodeId)
+        }
+
+        selectedNodeIdState[1](nodeId)
+    }
+
     return {
         selectedNodeIdState,
         nodesState,
         edgesState,
-        hoveredNodeIdState
+        hoveredNodeIdState,
+        hierarchicalEnabledState,
+        networkState,
+        selectNode
     }
 }

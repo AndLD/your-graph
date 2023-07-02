@@ -39,8 +39,25 @@
     height: 300px;
 
     img {
+        position: relative;
+        bottom: 0;
         max-width: 100%;
         max-height: 100%;
         box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
     }
+}
+
+.title-container {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    position: absolute;
+    z-index: 2 !important;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    width: 40vw;
+    text-align: center;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2);
+    transition: all ease 0.3s;
 }
