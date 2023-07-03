@@ -1,8 +1,7 @@
 import Graph from 'react-graph-vis'
 import { useCallback, useContext } from 'react'
 import { appContext } from '../context'
-import { ID, IHoverEvent, INode, ISelectEvent, IStabilizedEvent } from '../helpers/interfaces'
-import dayjs from 'dayjs'
+import { ID, IHoverEvent, ISelectEvent, IStabilizedEvent } from '../helpers/interfaces'
 import axios from 'axios'
 import { Utils } from '../helpers/utils'
 
@@ -101,11 +100,7 @@ export default function MyGraph() {
                         y: nodesObject[id].y
                     }))
 
-                console.log(body)
-
-                const response = await axios.put('/api/nodes', body)
-
-                console.log(response.data)
+                await axios.put('/api/nodes', body)
             }
         },
         [nodes]

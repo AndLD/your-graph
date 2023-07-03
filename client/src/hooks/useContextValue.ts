@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react'
-import { IConnection, IConnectionBackend, ID, INode, INodeBackend } from '../helpers/interfaces'
+import {
+    IConnection,
+    IConnectionBackend,
+    ID,
+    INode,
+    INodeBackend,
+    ISource,
+    ISourceBackend
+} from '../helpers/interfaces'
 import axios from 'axios'
 import dayjs from 'dayjs'
 
@@ -13,6 +21,8 @@ export default function useContextValue() {
     const hierarchicalEnabledState = useState(false)
 
     const networkState = useState<any>(null)
+
+    const sourcesState = useState<ISource[]>([])
 
     useEffect(() => {
         // Fetch nodes from the server
@@ -52,7 +62,19 @@ export default function useContextValue() {
             .then((response) => {
                 const { data }: { data: IConnectionBackend[] } = response
                 // Update the edgesState with the fetched connections
-                edgesState[1](data.map(({ _id, ...node }) => ({ id: _id, ...node })))
+                edgesState[1](data.map(({ _id, ...rest }) => ({ id: _id, ...rest })))
+            })
+            .catch((error) => {
+                console.error('Failed to fetch connections:', error)
+            })
+
+        // Fetch sources from the server
+        axios
+            .get('/api/sources')
+            .then((response) => {
+                const { data }: { data: ISourceBackend[] } = response
+                // Update the edgesState with the fetched connections
+                sourcesState[1](data.map(({ _id, ...rest }) => ({ id: _id, ...rest })))
             })
             .catch((error) => {
                 console.error('Failed to fetch connections:', error)
@@ -76,6 +98,7 @@ export default function useContextValue() {
         hoveredNodeIdState,
         hierarchicalEnabledState,
         networkState,
-        selectNode
+        selectNode,
+        sourcesState
     }
 }

@@ -8,6 +8,7 @@ import { appContext } from '../context'
 import { useMessages } from '../helpers/messages'
 import dayjs from 'dayjs'
 import { INode, INodeBackend } from '../helpers/interfaces'
+import SourcesSelect from './SourcesSelect/SourcesSelect'
 
 const { Dragger } = Upload
 
@@ -39,7 +40,8 @@ export default function UpdateNodeForm() {
                     color: selectedNode.color,
                     tags: selectedNode.tags,
                     startDate: selectedNode.startDate ? dayjs(selectedNode.startDate, 'DD.MM.YYYY') : undefined,
-                    endDate: selectedNode.endDate ? dayjs(selectedNode.endDate, 'DD.MM.YYYY') : undefined
+                    endDate: selectedNode.endDate ? dayjs(selectedNode.endDate, 'DD.MM.YYYY') : undefined,
+                    sourceId: selectedNode.sourceId
                 }
                 if ((newFieldsValue.color as any)?.toHexString) {
                     newFieldsValue.color = (newFieldsValue.color as any).toHexString()
@@ -100,7 +102,7 @@ export default function UpdateNodeForm() {
             data.endDate = data.endDate ? data.endDate.format('DD.MM.YYYY') : null
 
             Object.keys(data).forEach((key) => {
-                if (key === 'date' || (data[key] && key !== 'id')) {
+                if (data[key] !== undefined && key !== 'id') {
                     formData.append(key, data[key])
                 }
             })
@@ -142,7 +144,6 @@ export default function UpdateNodeForm() {
             }
 
             setFileList([])
-
             setIsLoading(false)
         })
     }
@@ -197,7 +198,7 @@ export default function UpdateNodeForm() {
                     </Form.Item>
 
                     <Form.Item name="color">
-                        <ColorPicker />
+                        <ColorPicker allowClear />
                     </Form.Item>
                 </div>
 
@@ -235,6 +236,10 @@ export default function UpdateNodeForm() {
                         </p>
                         <p className="ant-upload-text">Click or drag file to this area to upload</p>
                     </Dragger>
+                </Form.Item>
+
+                <Form.Item name="sourceId">
+                    <SourcesSelect form={form} />
                 </Form.Item>
 
                 <Form.Item style={{ display: 'none' }} key={5} name="tags">

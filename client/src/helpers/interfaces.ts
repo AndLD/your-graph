@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs'
 
-export type ID = number | string
+export type ID = string
 
 export interface INodeBackend {
     _id: ID
@@ -37,6 +37,7 @@ export interface INode {
     group?: string
     shape?: string
     font?: object
+    sourceId?: string | null
     x?: number
     y?: number
 }
@@ -64,4 +65,16 @@ export interface IHoverEvent {
 
 export interface IStabilizedEvent {
     iterations: number
+}
+
+export interface ISource {
+    id?: ID
+    title: string
+    link?: string | null
+}
+
+export interface ISourceBackend {
+    _id: ID
+    title: string
+    link?: string | null
 }
