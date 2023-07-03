@@ -22,6 +22,9 @@ async function post(req: Request, res: Response, next: NextFunction) {
         if (req.body.tags) {
             req.body.tags = JSON.parse(req.body.tags)
         }
+        if (req.body.sourceIds) {
+            req.body.sourceIds = JSON.parse(req.body.sourceIds)
+        }
         if (req.body.startDate === 'null') {
             req.body.startDate = null
         }
@@ -87,6 +90,9 @@ async function put(req: Request, res: Response, next: NextFunction) {
 
         if (req.body.tags) {
             req.body.tags = JSON.parse(req.body.tags)
+        }
+        if (req.body.sourceIds) {
+            req.body.sourceIds = JSON.parse(req.body.sourceIds)
         }
         if (req.body.startDate === 'null') {
             req.body.startDate = null

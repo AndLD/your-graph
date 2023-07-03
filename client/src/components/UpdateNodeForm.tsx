@@ -41,7 +41,7 @@ export default function UpdateNodeForm() {
                     tags: selectedNode.tags,
                     startDate: selectedNode.startDate ? dayjs(selectedNode.startDate, 'DD.MM.YYYY') : undefined,
                     endDate: selectedNode.endDate ? dayjs(selectedNode.endDate, 'DD.MM.YYYY') : undefined,
-                    sourceId: selectedNode.sourceId
+                    sourceIds: selectedNode.sourceIds
                 }
                 if ((newFieldsValue.color as any)?.toHexString) {
                     newFieldsValue.color = (newFieldsValue.color as any).toHexString()
@@ -97,6 +97,9 @@ export default function UpdateNodeForm() {
 
             if (data.tags) {
                 data.tags = JSON.stringify(data.tags)
+            }
+            if (data.sourceIds) {
+                data.sourceIds = JSON.stringify(data.sourceIds)
             }
             data.startDate = data.startDate ? data.startDate.format('DD.MM.YYYY') : null
             data.endDate = data.endDate ? data.endDate.format('DD.MM.YYYY') : null
@@ -238,7 +241,7 @@ export default function UpdateNodeForm() {
                     </Dragger>
                 </Form.Item>
 
-                <Form.Item name="sourceId">
+                <Form.Item name="sourceIds">
                     <SourcesSelect form={form} />
                 </Form.Item>
 

@@ -58,7 +58,7 @@ export default function SourcesSelect({ form, value, onChange, required }: ISour
                         link={source.link}
                         isSelectOpenState={[isOpen, setIsOpen]}
                         setIsSourceControlsHover={setIsSourceControlsHover}
-                        selectedSource={value}
+                        selectedSources={value}
                         setSourceEdit={setSourceEdit}
                         form={form}
                     />
@@ -69,17 +69,8 @@ export default function SourcesSelect({ form, value, onChange, required }: ISour
 
     return (
         <Select
-            options={
-                required
-                    ? options
-                    : [
-                          ...options,
-                          {
-                              value: null,
-                              label: <div onClick={() => form.setFieldValue('sourceId', null)}>Not selected</div>
-                          }
-                      ]
-            }
+            mode="multiple"
+            options={options}
             onDropdownVisibleChange={(open) => {
                 setNewSourceTitle('')
                 if (!isSourceControlsHover) {

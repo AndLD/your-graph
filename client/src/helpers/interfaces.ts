@@ -37,7 +37,7 @@ export interface INode {
     group?: string
     shape?: string
     font?: object
-    sourceId?: string | null
+    sourceIds?: string[]
     x?: number
     y?: number
 }

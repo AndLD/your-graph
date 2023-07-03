@@ -6,7 +6,7 @@ interface ISourceProps {
     id: string
     title: string
     link?: string | null
-    selectedSource: string
+    selectedSources: string[]
     isSelectOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
     setIsSourceControlsHover: React.Dispatch<React.SetStateAction<boolean>>
     setSourceEdit: React.Dispatch<React.SetStateAction<{ id: string; newTitle: string; title: string } | null>>
@@ -17,7 +17,7 @@ export default function Source({
     id,
     title,
     link,
-    selectedSource,
+    selectedSources,
     isSelectOpenState,
     setIsSourceControlsHover,
     setSourceEdit,
@@ -49,7 +49,7 @@ export default function Source({
                     id={id}
                     title={title}
                     link={link}
-                    selectedSource={selectedSource}
+                    selectedSources={selectedSources}
                     form={form}
                     setIsOpenSelect={setIsSelectOpen}
                     setIsSourceControlsHover={setIsSourceControlsHover}

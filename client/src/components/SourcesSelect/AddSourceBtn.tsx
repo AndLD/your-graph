@@ -17,7 +17,7 @@ export default function AddSourceBtn({
 
     const postSource = usePostSource((newSourceId: string) => {
         setNewSourceTitle('')
-        form.setFieldValue('sourceId', newSourceId)
+        form.setFieldValue('sourceIds', [...form.getFieldValue('sourceIds'), newSourceId])
     })
 
     return (

@@ -8,7 +8,7 @@ interface ISourceControlsProps {
     id: string
     title: string
     link?: string | null
-    selectedSource: string
+    selectedSources: string[]
     form: FormInstance<any>
     setIsOpenSelect: React.Dispatch<React.SetStateAction<boolean>>
     setIsSourceControlsHover: React.Dispatch<React.SetStateAction<boolean>>
@@ -19,7 +19,7 @@ export default function SourceControls({
     id,
     title,
     link,
-    selectedSource,
+    selectedSources,
     form,
     setIsOpenSelect,
     setIsSourceControlsHover,
@@ -41,8 +41,11 @@ export default function SourceControls({
                 id={id}
                 callback={() => {
                     setIsSourceControlsHover(false)
-                    if (id === selectedSource) {
-                        form.setFieldValue('sourceId', sources.length ? sources[0].id : undefined)
+                    if (selectedSources.includes(id)) {
+                        form.setFieldValue(
+                            'sourceIds',
+                            selectedSources.filter((sourceId) => sourceId !== id)
+                        )
                     }
                 }}
             />
