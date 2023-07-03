@@ -5,6 +5,7 @@ import NewSourceInput from './NewSourceInput'
 import Source from './Source'
 import { appContext } from '../../context'
 import { ID, ISource } from '../../helpers/interfaces'
+import { WarningOutlined } from '@ant-design/icons'
 
 interface ISourcesStateProps {
     form: FormInstance<any>

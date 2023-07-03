@@ -17,7 +17,7 @@ async function get(req: Request, res: Response, next: NextFunction) {
 
 async function post(req: Request, res: Response, next: NextFunction) {
     try {
-        const selectedNodeId = req.query.selectedNodeId
+        const { selectedNodeId, type } = req.query
 
         if (req.body.tags) {
             req.body.tags = JSON.parse(req.body.tags)
@@ -47,7 +47,10 @@ async function post(req: Request, res: Response, next: NextFunction) {
             }
 
             if (selectedNodeId) {
-                const connection = { from: selectedNodeId, to: result.insertedId.toString() }
+                const connection =
+                    type === 'child'
+                        ? { from: selectedNodeId, to: result.insertedId.toString() }
+                        : { from: result.insertedId.toString(), to: selectedNodeId }
 
                 result = await db.collection('connections').insertOne(connection)
 

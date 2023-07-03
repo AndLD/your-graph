@@ -1,9 +1,10 @@
-import { Button } from 'antd'
+import { Button, Tooltip } from 'antd'
 import { useContext, useState, useEffect } from 'react'
 import { appContext } from '../context'
 import { useMessages } from '../helpers/messages'
 import axios from 'axios'
 import { INode } from '../helpers/interfaces'
+import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
 
 export default function AddNodeBtn() {
     const {
@@ -24,15 +25,25 @@ export default function AddNodeBtn() {
 
     const { successMessage, errorMessage, contextHolder } = useMessages()
 
-    function addNode() {
+    function addNode(type?: 'child' | 'parent') {
+        const body: any = {}
         const params: any = {}
+
         if (selectedNodeId) {
+            const { x, y } = nodes.find((node) => node.id === selectedNodeId) as INode
+            if (x) {
+                body.x = x
+            }
+            if (y) {
+                body.y = y
+            }
             params.selectedNodeId = selectedNodeId
+            params.type = type
         }
 
         // Make a POST request to add an empty node
         axios
-            .post('http://localhost:8080/api/nodes', {}, { params })
+            .post('/api/nodes', body, { params })
             .then((response) => {
                 successMessage()
                 const { _id: nodeId, ...rest } = response.data.node
@@ -58,9 +69,30 @@ export default function AddNodeBtn() {
     return (
         <div style={{ margin: 10 }}>
             {contextHolder}
-            <Button type="primary" onClick={addNode}>
-                Add node
-            </Button>
+            {selectedNodeId ? (
+                <div style={{ width: 91.95, display: 'flex', justifyContent: 'space-between' }}>
+                    <Tooltip title="Add parent">
+                        <Button
+                            style={{ width: 40 }}
+                            type="primary"
+                            onClick={() => addNode('parent')}
+                            icon={<LoginOutlined />}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Add child">
+                        <Button
+                            style={{ width: 40 }}
+                            type="primary"
+                            onClick={() => addNode('child')}
+                            icon={<LogoutOutlined />}
+                        />
+                    </Tooltip>
+                </div>
+            ) : (
+                <Button type="primary" onClick={() => addNode()}>
+                    Add node
+                </Button>
+            )}
         </div>
     )
 }

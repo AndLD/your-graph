@@ -12,6 +12,7 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 
 export default function useContextValue() {
+    const darkThemeEnabledState = useState(JSON.parse(localStorage.getItem('darkThemeEnabled') || 'false'))
     const selectedNodeIdState = useState<null | ID>(null)
     const hoveredNodeIdState = useState<null | ID>(null)
 
@@ -81,6 +82,10 @@ export default function useContextValue() {
             })
     }, [])
 
+    useEffect(() => {
+        localStorage.setItem('darkThemeEnabled', darkThemeEnabledState[0])
+    }, [darkThemeEnabledState[0]])
+
     function selectNode(nodeId: string, focus = false) {
         networkState[0].selectNodes([nodeId])
 
@@ -91,7 +96,47 @@ export default function useContextValue() {
         selectedNodeIdState[1](nodeId)
     }
 
+    function updateConnection(to: ID) {
+        const [selectedNodeId] = selectedNodeIdState
+        const [edges, setEdges] = edgesState
+
+        // Selected node exists and it was not selected twice
+        if (selectedNodeId && selectedNodeId !== to) {
+            const connection = edges.find(
+                (edge) =>
+                    (edge.from === selectedNodeId && edge.to === to) || (edge.from === to && edge.to === selectedNodeId)
+            )
+
+            // If connection already exists delete it otherwise create
+            if (connection) {
+                axios
+                    .delete(`/api/connections/${connection.id}`)
+                    .then((response) => {
+                        // Upon successful deletion, remove from edges state
+                        setEdges(edges.filter(({ id }) => id !== connection.id))
+                    })
+                    .catch((error) => {
+                        console.error('Failed to delete connection:', error)
+                    })
+            } else {
+                const newConnection = { from: selectedNodeId, to }
+                axios
+                    .post('/api/connections', newConnection)
+                    .then((response) => {
+                        const { _id, ...rest } = response.data
+
+                        // Upon successful creation, add to edges state
+                        setEdges([...edges, { id: _id, ...rest }])
+                    })
+                    .catch((error) => {
+                        console.error('Failed to create connection:', error)
+                    })
+            }
+        }
+    }
+
     return {
+        darkThemeEnabledState,
         selectedNodeIdState,
         nodesState,
         edgesState,
@@ -99,6 +144,7 @@ export default function useContextValue() {
         hierarchicalEnabledState,
         networkState,
         selectNode,
-        sourcesState
+        sourcesState,
+        updateConnection
     }
 }

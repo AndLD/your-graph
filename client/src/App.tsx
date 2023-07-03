@@ -5,10 +5,12 @@ import useContextValue from './hooks/useContextValue'
 import UpdateNodeFormWrapper from './components/UpdateNodeFormWrapper'
 import ImageContainer from './components/ImageContainer'
 import TitleContainer from './components/TitleContainer'
+import SearchContainer from './components/SearchContainer'
 
 function App() {
     return (
         <appContext.Provider value={useContextValue()}>
+            <SearchContainer />
             <UpdateNodeFormWrapper />
             <ImageContainer />
             <TitleContainer />

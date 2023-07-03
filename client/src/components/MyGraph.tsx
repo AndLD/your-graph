@@ -7,12 +7,14 @@ import { Utils } from '../helpers/utils'
 
 export default function MyGraph() {
     const {
+        darkThemeEnabledState: [darkThemeEnabled, setDarkThemeEnabled],
         nodesState: [nodes, setNodes],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
         edgesState: [edges, setEdges],
         hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId],
         hierarchicalEnabledState: [hierarchicalEnabled, setHierarchinalEnabled],
-        networkState: [network, setNetwork]
+        networkState: [network, setNetwork],
+        updateConnection
     } = useContext(appContext)
 
     const options = {
@@ -28,13 +30,13 @@ export default function MyGraph() {
             size: 30,
             shape: 'dot',
             color: {
-                border: '#222222',
-                background: '#666666'
+                border: darkThemeEnabled ? '#666666' : '#222222',
+                background: darkThemeEnabled ? '#999999' : '#666666'
             },
-            font: { color: '#666666' }
+            font: { color: darkThemeEnabled ? '#999999' : '#666666' }
         },
         edges: {
-            color: '#666666',
+            color: darkThemeEnabled ? '#999999' : '#666666',
             smooth: {
                 enabled: true
                 // type: 'cubicBezier'
@@ -51,43 +53,7 @@ export default function MyGraph() {
         }
     }
 
-    function updateConnection(to: ID) {
-        // Selected node exists and it was not selected twice
-        if (selectedNodeId && selectedNodeId !== to) {
-            const connection = edges.find(
-                (edge) =>
-                    (edge.from === selectedNodeId && edge.to === to) || (edge.from === to && edge.to === selectedNodeId)
-            )
-
-            // If connection already exists delete it otherwise create
-            if (connection) {
-                axios
-                    .delete(`/api/connections/${connection.id}`)
-                    .then((response) => {
-                        // Upon successful deletion, remove from edges state
-                        setEdges(edges.filter(({ id }) => id !== connection.id))
-                    })
-                    .catch((error) => {
-                        console.error('Failed to delete connection:', error)
-                    })
-            } else {
-                const newConnection = { from: selectedNodeId, to }
-                axios
-                    .post('/api/connections', newConnection)
-                    .then((response) => {
-                        const { _id, ...rest } = response.data
-
-                        // Upon successful creation, add to edges state
-                        setEdges([...edges, { id: _id, ...rest }])
-                    })
-                    .catch((error) => {
-                        console.error('Failed to create connection:', error)
-                    })
-            }
-        }
-    }
-
-    const stabilizedCallback = useCallback(
+    const onStabilized = useCallback(
         async function ({ iterations }: IStabilizedEvent) {
             if (iterations > 100) {
                 const nodesObject = network.body.nodes
@@ -132,11 +98,11 @@ export default function MyGraph() {
                 setSelectedNodeId(nodeId)
             }
         },
-        stabilized: stabilizedCallback
+        stabilized: onStabilized
     }
 
     return (
-        <div className="graph-container">
+        <div className="graph-container" style={{ background: darkThemeEnabled ? '#222222' : 'white' }}>
             <Graph
                 id="myGraph"
                 graph={{

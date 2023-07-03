@@ -214,10 +214,7 @@ export default function UpdateNodeForm() {
                         <DatePicker placeholder="Start" format="DD.MM.YYYY" />
                     </Form.Item>
 
-                    <Form.Item
-                        name="endDate"
-                        style={{ width: '47%', opacity: form.getFieldValue('startDate') ? 1 : 0 }}
-                    >
+                    <Form.Item name="endDate" style={{ width: '47%' }}>
                         <DatePicker placeholder="End" format="DD.MM.YYYY" />
                     </Form.Item>
                 </div>

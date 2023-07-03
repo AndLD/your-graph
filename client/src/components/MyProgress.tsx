@@ -1,25 +1,37 @@
-import { Progress } from 'antd'
+import { Progress, Tooltip } from 'antd'
 import { useContext } from 'react'
 import { appContext } from '../context'
 
-// TODO: implement
-// function getBorder(currentValue: number) {
-//     return Math.round(currentValue / 500)
-// }
+function calculateUpBorder(value: number) {
+    const base = 500
+    const multiplier = Math.floor(value / base)
+
+    if (value % base === 0) {
+        return base * (multiplier * 3)
+    } else {
+        return base * (multiplier + 1)
+    }
+}
 
 export default function MyProgress() {
     const {
+        darkThemeEnabledState: [darkThemeEnabled, setDarkThemeEnabled],
         nodesState: [nodes, setNodes]
     } = useContext(appContext)
 
+    const upBorder = calculateUpBorder(nodes.length)
+
     return (
         <div style={{ marginTop: 10 }}>
-            <Progress
-                type="circle"
-                size="small"
-                percent={(100 * nodes.length) / 500}
-                format={(percent) => nodes.length}
-            />
+            <Tooltip placement="left" title={upBorder}>
+                <Progress
+                    style={{ background: 'white', borderRadius: '50%' }}
+                    type="circle"
+                    size="small"
+                    percent={(100 * nodes.length) / upBorder}
+                    format={(percent) => nodes.length}
+                />
+            </Tooltip>
         </div>
     )
 }

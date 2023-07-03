@@ -10,6 +10,7 @@ export default function SwitchHierarchical() {
     const onChange = () => {
         setHierarchinalEnabled(!hierarchicalEnabled)
     }
+
     return (
         <div>
             <Tooltip placement="left" title="Hierarchical">
