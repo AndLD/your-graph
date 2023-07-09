@@ -1,7 +1,7 @@
 import Graph from 'react-graph-vis'
-import { useCallback, useContext } from 'react'
+import { useCallback, useContext, useEffect } from 'react'
 import { appContext } from '../context'
-import { ID, IHoverEvent, ISelectEvent, IStabilizedEvent } from '../helpers/interfaces'
+import { IHoverEvent, ISelectEvent, IStabilizedEvent } from '../helpers/interfaces'
 import axios from 'axios'
 import { Utils } from '../helpers/utils'
 
@@ -14,10 +14,13 @@ export default function MyGraph() {
         hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId],
         hierarchicalEnabledState: [hierarchicalEnabled, setHierarchinalEnabled],
         networkState: [network, setNetwork],
-        updateConnection
+        updateConnection,
+        deselectNodes,
+        isUpdateNodeFormVisibleState: [isUpdateNodeFormVisible, setIsUpdateNodeFormVisible]
     } = useContext(appContext)
 
     const options = {
+        autoResize: true,
         physics: {
             stabilization: true,
             wind: { x: 0, y: 0 }
@@ -53,6 +56,20 @@ export default function MyGraph() {
         }
     }
 
+    const onEscKeyDown = (event: KeyboardEvent) => {
+        if (selectedNodeId && event.key === 'Escape') {
+            deselectNodes()
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('keydown', onEscKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', onEscKeyDown)
+        }
+    }, [selectedNodeId])
+
     const onStabilized = useCallback(
         async function ({ iterations }: IStabilizedEvent) {
             if (iterations > 100) {
@@ -71,6 +88,10 @@ export default function MyGraph() {
         },
         [nodes]
     )
+
+    const onDoubleClick = useCallback(() => {
+        setIsUpdateNodeFormVisible(true)
+    }, [nodes])
 
     const events = {
         select: function ({ nodes, edges, event }: ISelectEvent) {
@@ -98,7 +119,8 @@ export default function MyGraph() {
                 setSelectedNodeId(nodeId)
             }
         },
-        stabilized: onStabilized
+        stabilized: onStabilized,
+        doubleClick: onDoubleClick
     }
 
     return (

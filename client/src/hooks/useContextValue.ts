@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
     IConnection,
     IConnectionBackend,
@@ -24,6 +24,8 @@ export default function useContextValue() {
     const networkState = useState<any>(null)
 
     const sourcesState = useState<ISource[]>([])
+
+    const isUpdateNodeFormVisibleState = useState(false)
 
     useEffect(() => {
         // Fetch nodes from the server
@@ -86,6 +88,12 @@ export default function useContextValue() {
         localStorage.setItem('darkThemeEnabled', darkThemeEnabledState[0])
     }, [darkThemeEnabledState[0]])
 
+    useEffect(() => {
+        if (!selectedNodeIdState[0]) {
+            isUpdateNodeFormVisibleState[1](false)
+        }
+    }, [selectedNodeIdState[0]])
+
     function selectNode(nodeId: string, focus = false) {
         networkState[0].selectNodes([nodeId])
 
@@ -94,6 +102,11 @@ export default function useContextValue() {
         }
 
         selectedNodeIdState[1](nodeId)
+    }
+
+    function deselectNodes() {
+        selectedNodeIdState[1](null)
+        networkState[0].unselectAll()
     }
 
     function updateConnection(to: ID) {
@@ -145,6 +158,8 @@ export default function useContextValue() {
         networkState,
         selectNode,
         sourcesState,
-        updateConnection
+        updateConnection,
+        deselectNodes,
+        isUpdateNodeFormVisibleState
     }
 }

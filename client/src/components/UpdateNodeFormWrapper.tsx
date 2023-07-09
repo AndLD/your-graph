@@ -3,8 +3,9 @@ import UpdateNodeForm from './UpdateNodeForm'
 import { useContext } from 'react'
 export default function UpdateNodeFormWrapper() {
     const {
-        selectedNodeIdState: [selectedNodeId, setSelectedNodeId]
+        selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
+        isUpdateNodeFormVisibleState: [isUpdateNodeFormVisible, setIsUpdateNodeFormVisible]
     } = useContext(appContext)
 
-    return selectedNodeId ? <UpdateNodeForm /> : null
+    return selectedNodeId && isUpdateNodeFormVisible ? <UpdateNodeForm /> : null
 }

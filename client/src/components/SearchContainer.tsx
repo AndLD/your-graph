@@ -4,6 +4,7 @@ import { BaseOptionType } from 'antd/es/select'
 import { useContext, useEffect, useState } from 'react'
 import { appContext } from '../context'
 import { ID } from '../helpers/interfaces'
+import { WarningOutlined } from '@ant-design/icons'
 
 interface IApplicableKey {
     id: ID
@@ -86,8 +87,14 @@ export default function SearchContainer() {
                     }
                 }}
             >
-                <Input.Search size="large" placeholder="Search box" />
+                <Input size="large" placeholder="Search box" />
             </AutoComplete>
+            {/* TODO: Remove */}
+            {/* {selectedNodeId ? (
+                <div style={{ color: 'orange', marginTop: 10 }}>
+                    Connect mode <WarningOutlined color="orange" />
+                </div>
+            ) : null} */}
         </div>
     )
 }

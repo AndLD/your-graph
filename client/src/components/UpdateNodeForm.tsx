@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { DatePicker, Form, Input, Button, ColorPicker, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { useForm } from 'antd/es/form/Form'
@@ -19,12 +19,28 @@ export default function UpdateNodeForm() {
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId]
     } = useContext(appContext)
 
+    const updateBtnRef = useRef<HTMLElement>(null)
+
     const [isLoading, setIsLoading] = useState(false)
     const { successMessage, errorMessage, contextHolder } = useMessages()
 
     const [form] = useForm()
     const [tags, setTags] = useState<string[]>(form.getFieldValue('tags'))
     const [fileList, setFileList] = useState<any[]>([])
+
+    const onEnterKeyDown = (event: KeyboardEvent) => {
+        if (updateBtnRef.current && event.key === 'Enter') {
+            updateBtnRef.current.click()
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('keydown', onEnterKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', onEnterKeyDown)
+        }
+    }, [])
 
     useEffect(() => {
         setFileList([])
@@ -69,7 +85,14 @@ export default function UpdateNodeForm() {
         onChange(info: any) {
             let fileList = [...info.fileList]
             fileList = fileList.slice(-1) // We only want the last file
-            setFileList(fileList)
+
+            fileList = fileList.map((file) => {
+                file.status = 'success'
+
+                return file
+            })
+
+            if (fileList.length) setFileList(fileList)
         }
     }
 
@@ -248,7 +271,13 @@ export default function UpdateNodeForm() {
             </Form>
 
             <div style={{ textAlign: 'right' }}>
-                <Button type="primary" style={{ marginRight: 10 }} onClick={updateNode} loading={isLoading}>
+                <Button
+                    type="primary"
+                    style={{ marginRight: 10 }}
+                    onClick={updateNode}
+                    loading={isLoading}
+                    ref={updateBtnRef}
+                >
                     Update
                 </Button>
                 <Button danger onClick={deleteNode}>
