@@ -1,22 +1,14 @@
-import MyGraph from './components/MyGraph'
-import Controls from './components/Controls'
-import { appContext } from './context'
-import useContextValue from './hooks/useContextValue'
-import UpdateNodeFormWrapper from './components/UpdateNodeFormWrapper'
-import ImageContainer from './components/ImageContainer'
-import TitleContainer from './components/TitleContainer'
-import SearchContainer from './components/SearchContainer'
+import { BrowserRouter } from 'react-router-dom'
+import AppRoutes from './components/AppRoutes'
+import { useAuth } from './hooks/auth'
 
 function App() {
+    useAuth()
+
     return (
-        <appContext.Provider value={useContextValue()}>
-            <SearchContainer />
-            <UpdateNodeFormWrapper />
-            <ImageContainer />
-            <TitleContainer />
-            <MyGraph />
-            <Controls />
-        </appContext.Provider>
+        <BrowserRouter>
+            <AppRoutes />
+        </BrowserRouter>
     )
 }
 

@@ -1,4 +1,6 @@
 import { createContext } from 'react'
-import useContextValue from './hooks/useContextValue'
+import useClusterContextValue from './hooks/useClusterContextValue'
+import useLayoutContext from './hooks/pages/layout'
 
-export const appContext = createContext({} as ReturnType<typeof useContextValue>)
+export const clusterContext = createContext({} as ReturnType<typeof useClusterContextValue>)
+export const layoutContext = createContext<any>({} as ReturnType<typeof useLayoutContext>)

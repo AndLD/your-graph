@@ -1,10 +1,10 @@
 import { useContext } from 'react'
-import { appContext } from '../context'
+import { clusterContext } from '../context'
 import { ISource } from '../helpers/interfaces'
 import axios from 'axios'
 
 export function usePostSource(callback: (newSourceId: string) => void) {
-    const [sources, setSources] = useContext(appContext).sourcesState
+    const [sources, setSources] = useContext(clusterContext).sourcesState
 
     return (title: string, link: string | null) => {
         axios
@@ -24,7 +24,7 @@ export function usePostSource(callback: (newSourceId: string) => void) {
 export function useDeleteSource() {
     const {
         sourcesState: [sources, setSources]
-    } = useContext(appContext)
+    } = useContext(clusterContext)
 
     return (id: string) => {
         axios.delete(`/api/sources/${id}`).then(() => {
@@ -36,7 +36,7 @@ export function useDeleteSource() {
 }
 
 export function usePutSource(callback: () => void) {
-    const [sources, setSources] = useContext(appContext).sourcesState
+    const [sources, setSources] = useContext(clusterContext).sourcesState
 
     return (id: string, body: ISource) => {
         axios.put(`/api/sources/${id}`, body).then((response: any) => {

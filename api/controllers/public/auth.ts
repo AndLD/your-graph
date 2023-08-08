@@ -1,0 +1,104 @@
+import { Response } from 'express'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import { db, dbService } from '../../services/db'
+import { tryCatch } from '../../utils/decorators'
+import { Error } from '../../utils/types'
+import { IAuthPostBody } from '../../utils/interfaces/auth'
+import { entities, errors } from '../../utils/constants'
+import { IUser, IUserState } from '../../utils/interfaces/user'
+import { createJwt, refreshJwtSecret } from '../../utils/jwt'
+import { apiUtils } from '../../utils/api'
+
+interface IRefreshJwtPayload extends jwt.JwtPayload {
+    user: {
+        id: string
+    }
+}
+
+async function postLogin(req: any, res: Response) {
+    const body: IAuthPostBody = req.body
+
+    const user: IUser = await db.collection(entities.USERS).findOne({ email: body.email })
+
+    if (!user) {
+        return apiUtils.sendError(res, errors.CREDENTIALS_INVALID)
+    }
+
+    // Password check
+    const isPasswordValid = await bcrypt.compare(body.password, user.password)
+
+    if (!isPasswordValid) {
+        return apiUtils.sendError(res, errors.CREDENTIALS_INVALID)
+    }
+
+    // JWT
+    const userState: IUserState = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        active: user.active,
+        timestamp: user.timestamp,
+        lastUpdateTimestamp: user.lastUpdateTimestamp
+    }
+
+    const tokens = createJwt(userState)
+
+    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true })
+    res.json({
+        result: tokens.accessToken
+    })
+}
+
+async function getRefresh(req: any, res: Response) {
+    const refreshToken = req.cookies.refreshToken
+
+    if (!refreshToken) {
+        return apiUtils.sendError(res, errors.UNABLE_TO_REFRESH_ACCESS_JWT)
+    }
+
+    // TODO: Investigate cases when jwt.verify can return a string ?
+    try {
+        var decodeValue: IRefreshJwtPayload = jwt.verify(refreshToken, refreshJwtSecret) as IRefreshJwtPayload
+    } catch (e) {
+        return apiUtils.sendError(res, errors.UNABLE_TO_REFRESH_ACCESS_JWT)
+    }
+    if (!decodeValue?.user) {
+        throw new Error('decodeValue.user is empty!')
+    }
+
+    const userId = decodeValue.user.id
+
+    const user = await db.collection(entities.USERS).findOne({ _id: userId })
+
+    if (!user) {
+        return res.sendStatus(401)
+    }
+
+    const userState: IUserState = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        active: user.active,
+        timestamp: user.timestamp,
+        lastUpdateTimestamp: user.lastUpdateTimestamp
+    }
+
+    const tokens = createJwt(userState)
+
+    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true })
+    apiUtils.sendResult(res, tokens.accessToken)
+}
+
+async function postLogout(_: any, res: Response) {
+    res.clearCookie('refreshToken')
+    res.sendStatus(200)
+}
+
+export const authPublicControllers = {
+    postLogin: tryCatch(postLogin),
+    getRefresh: tryCatch(getRefresh),
+    postLogout: tryCatch(postLogout)
+}
