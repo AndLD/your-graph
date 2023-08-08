@@ -28,19 +28,20 @@ export default function UpdateNodeForm() {
     const [tags, setTags] = useState<string[]>(form.getFieldValue('tags'))
     const [fileList, setFileList] = useState<any[]>([])
 
+    // TODO: Handle situation, when user just move cursor to new line in description field. In this case it should not submit the form.
     const onEnterKeyDown = (event: KeyboardEvent) => {
         if (updateBtnRef.current && event.key === 'Enter') {
             updateBtnRef.current.click()
         }
     }
 
-    useEffect(() => {
-        window.addEventListener('keydown', onEnterKeyDown)
+    // useEffect(() => {
+    //     window.addEventListener('keydown', onEnterKeyDown)
 
-        return () => {
-            window.removeEventListener('keydown', onEnterKeyDown)
-        }
-    }, [])
+    //     return () => {
+    //         window.removeEventListener('keydown', onEnterKeyDown)
+    //     }
+    // }, [])
 
     useEffect(() => {
         setFileList([])
@@ -229,7 +230,7 @@ export default function UpdateNodeForm() {
                 </div>
 
                 <Form.Item name="description">
-                    <Input.TextArea placeholder="Description" style={{ height: 100 }} />
+                    <Input.TextArea showCount={true} placeholder="Description" style={{ height: 100 }} />
                 </Form.Item>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
