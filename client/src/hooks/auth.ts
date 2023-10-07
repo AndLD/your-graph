@@ -10,12 +10,15 @@ export function useAuth() {
     const token = useToken()
     const [isVerifyTokenSkip, setIsVerifyTokenSkip] = useState<boolean>(true)
 
-    const verifyTokenQuery = useVerifyTokenQuery(undefined, { skip: isVerifyTokenSkip })
+    const verifyTokenQuery = useVerifyTokenQuery(undefined, {
+        skip: isVerifyTokenSkip,
+    })
     const refreshToken = useRefreshToken()
 
     useEffect(() => {
         if (token) {
             if (isJwtExpired(token)) {
+                console.log(11)
                 refreshToken()
             } else {
                 dispatch(appSlice.actions.setToken(token))

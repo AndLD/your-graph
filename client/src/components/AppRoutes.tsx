@@ -8,7 +8,6 @@ import { parseUser } from '../utils/jwt'
 import { useToken } from '../hooks/auth'
 import { layoutContext } from '../context'
 import useLayoutContext from '../hooks/pages/layout'
-// import { inactiveRoutes } from '../routes/inactiveRoutes'
 
 export default function AppRoutes() {
     const token = useToken()
@@ -36,11 +35,19 @@ export default function AppRoutes() {
                     setRedirectRoute('/admin')
                     break
                 case 'user':
-                    setRoutes(privateRoutes.filter((route) => route.path === '/cluster'))
+                    setRoutes(
+                        privateRoutes.filter(
+                            (route) => route.path === '/cluster'
+                        )
+                    )
                     setRedirectRoute('/cluster')
                     break
                 case 'unlimited':
-                    setRoutes(privateRoutes.filter((route) => route.path === '/cluster'))
+                    setRoutes(
+                        privateRoutes.filter(
+                            (route) => route.path === '/cluster'
+                        )
+                    )
                     setRedirectRoute('/cluster')
                     break
                 default:
@@ -55,8 +62,20 @@ export default function AppRoutes() {
     }, [token])
 
     const routing = useRoutes(
-        redirectRoute ? [...routes, { path: '*', element: <Navigate replace to={redirectRoute} /> }] : routes
+        redirectRoute
+            ? [
+                  ...routes,
+                  {
+                      path: '*',
+                      element: <Navigate replace to={redirectRoute} />,
+                  },
+              ]
+            : routes
     )
 
-    return <layoutContext.Provider value={useLayoutContext()}>{routing}</layoutContext.Provider>
+    return (
+        <layoutContext.Provider value={useLayoutContext()}>
+            {routing}
+        </layoutContext.Provider>
+    )
 }

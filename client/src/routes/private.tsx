@@ -1,5 +1,6 @@
 import { RouteObject } from 'react-router-dom'
 import Cluster from '../pages/Cluster'
+import Authorized from '../pages/Authorized'
 // import Dashboard from '../pages/Dashboard'
 // import AdminLayout from '../components/AdminLayout'
 // import Settings from '../pages/Settings'
@@ -30,8 +31,12 @@ const privateRoutes: RouteObject[] = [
     // },
     {
         path: '/cluster',
-        element: <Cluster />
-    }
+        element: <Cluster />,
+    },
+    {
+        path: '/authorized',
+        element: <Authorized />,
+    },
 ]
 
 export default privateRoutes

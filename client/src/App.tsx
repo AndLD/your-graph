@@ -3,7 +3,7 @@ import AppRoutes from './components/AppRoutes'
 import { useAuth } from './hooks/auth'
 
 function App() {
-    useAuth()
+    // useAuth()
 
     return (
         <BrowserRouter>

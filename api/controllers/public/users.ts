@@ -2,7 +2,11 @@ import { Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { tryCatch } from '../../utils/decorators'
 import { IUserState, IUserPostBody } from '../../utils/interfaces/user'
-import { createEmailVerificationJwt, createJwt, emailVerificationJwtSecret } from '../../utils/jwt'
+import {
+    createEmailVerificationJwt,
+    createJwt,
+    emailVerificationJwtSecret,
+} from '../../utils/jwt'
 import { usersService } from '../../services/users'
 import { emailService } from '../../services/email'
 import { apiUtils } from '../../utils/api'
@@ -14,31 +18,39 @@ const logger = getLogger('controllers/private/users')
 async function postUser(req: any, res: Response) {
     const body: IUserPostBody = req.body
 
-    const user = await usersService.addUser(body, res)
-    if (!user) {
+    const user = await usersService.getUserByEmail(body.email, res)
+    if (user) {
+        return apiUtils.sendError(res, errors.EMAIL_ALREADY_EXISTS)
+    }
+
+    const createdUser = await usersService.addUser(body, res)
+    if (!createdUser) {
         return
     }
 
     const userState: IUserState = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        status: user.status,
-        active: user.active,
-        timestamp: user.timestamp,
-        lastUpdateTimestamp: user.lastUpdateTimestamp
+        _id: createdUser._id,
+        name: createdUser.name,
+        email: createdUser.email,
+        status: createdUser.status,
+        active: createdUser.active,
+        timestamp: createdUser.timestamp,
+        lastUpdateTimestamp: createdUser.lastUpdateTimestamp,
     }
 
     const tokens = createJwt(userState)
 
     res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true })
 
-    if (!user.active) {
-        emailService.sendEmailVerification(user.email, createEmailVerificationJwt(user.id))
+    if (!createdUser.active) {
+        emailService.sendEmailVerification(
+            createdUser.email,
+            createEmailVerificationJwt(createdUser._id.toString())
+        )
     }
 
     res.json({
-        result: tokens.accessToken
+        result: tokens.accessToken,
     })
 }
 
@@ -54,9 +66,10 @@ async function getVerifyEmail(req: any, res: Response) {
 
         // TODO: Validate decodeValue ?
 
-        const userId = decodeValue.user.id
+        const userId = decodeValue.user._id
 
         const updatedUser = await usersService.activateUser(userId, res)
+
         if (!updatedUser) {
             return
         }
@@ -72,5 +85,5 @@ async function getVerifyEmail(req: any, res: Response) {
 
 export const usersPublicControllers = {
     postUser: tryCatch(postUser),
-    getVerifyEmail: tryCatch(getVerifyEmail)
+    getVerifyEmail: tryCatch(getVerifyEmail),
 }

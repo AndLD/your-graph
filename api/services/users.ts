@@ -1,8 +1,17 @@
 import bcrypt from 'bcrypt'
 import { Response } from 'express'
 import { apiUtils } from '../utils/api'
-import { entities, errors, rootUser as rootUserConfig } from '../utils/constants'
-import { IUser, IUserPost, IUserPostBody, UserStatus } from '../utils/interfaces/user'
+import {
+    entities,
+    errors,
+    rootUser as rootUserConfig,
+} from '../utils/constants'
+import {
+    IUser,
+    IUserPost,
+    IUserPostBody,
+    UserStatus,
+} from '../utils/interfaces/user'
 import { getKeywords } from '../utils/keywords'
 import { getLogger } from '../utils/logger'
 import { db } from './db'
@@ -13,14 +22,16 @@ const logger = getLogger('services/users')
 const entity = entities.USERS
 
 async function countUsersByState(res: Response) {
-    const raws = (await db.collection(entity).find({}, { projection: { status: 1 } })) as { status: UserStatus }[]
+    const raws = (await db
+        .collection(entity)
+        .find({}, { projection: { status: 1 } })) as { status: UserStatus }[]
 
     const users = {
         admin: 0,
         owner: 0,
         user: 0,
         unlimited: 0,
-        banned: 0
+        banned: 0,
     }
 
     for (const raw of raws) {
@@ -31,7 +42,9 @@ async function countUsersByState(res: Response) {
 }
 
 async function getRootUser() {
-    const rootUser: IUser = await db.collection(entities.USERS).findOne({ email: rootUserConfig.email })
+    const rootUser: IUser = await db
+        .collection(entities.USERS)
+        .findOne({ email: rootUserConfig.email })
 
     // If root user not found, create it
     if (!rootUser) {
@@ -53,26 +66,34 @@ async function getRootUser() {
 }
 
 // If 'res' argument not spesified, the function will add user with 'admin' status
-async function addUser(body: IUserPostBody, res?: Response): Promise<IUser | void> {
+async function addUser(
+    body: IUserPostBody,
+    res?: Response
+): Promise<IUser | void> {
     const hashedPassword: string = await bcrypt.hash(body.password, 10)
 
     const userObj: IUserPost = {
         ...body,
         password: hashedPassword,
         status: res ? 'user' : 'admin',
-        active: res ? false : true,
-        currentTaskId: null,
-        keywords: getKeywords(body.email, body.name)
+        active: !res,
+        keywords: getKeywords(body.email, body.name),
     }
 
     const result = await db.collection(entity).insertOne(userObj)
-    const user = result.ops[0]
+    const user = await db.collection(entity).findOne({ _id: result.insertedId })
 
     if (!user && res) {
         return apiUtils.sendError(res, errors.DOC_NOT_FOUND)
     }
 
     return user as IUser
+}
+
+async function getUserByEmail(email: string, res: Response) {
+    const result = await db.collection(entity).findOne({ email })
+
+    return result
 }
 
 async function activateUser(userId: string, res: Response) {
@@ -84,7 +105,7 @@ async function activateUser(userId: string, res: Response) {
             { returnDocument: 'after', upsert: false }
         )
 
-    if (!result.modifiedCount) {
+    if (!result.ok) {
         return apiUtils.sendError(res, errors.DOC_NOT_FOUND)
     }
 
@@ -93,7 +114,10 @@ async function activateUser(userId: string, res: Response) {
 
 // Delete inactive users older 24 hours
 async function deleteInactiveUsers() {
-    await db.collection(entity).deleteMany({ active: false, timestamp: { $lt: Date.now() - 24 * 60 * 60 * 1000 } })
+    await db.collection(entity).deleteMany({
+        active: false,
+        timestamp: { $lt: Date.now() - 24 * 60 * 60 * 1000 },
+    })
 
     logger.info('Deleted inactive users older 24 hours')
 }
@@ -103,5 +127,6 @@ export const usersService = {
     getRootUser,
     addUser,
     activateUser,
-    deleteInactiveUsers
+    deleteInactiveUsers,
+    getUserByEmail,
 }

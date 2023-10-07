@@ -1,11 +1,10 @@
 export interface IUser {
-    id: string
+    _id: string
     name: string
     email: string
     password: string
     status: UserStatus
     active: boolean
-    currentTaskId: string | null
     timestamp: number
     lastUpdateTimestamp?: number
     keywords: string[]
@@ -13,7 +12,7 @@ export interface IUser {
 }
 
 export interface IUserState {
-    id: string
+    _id: string
     name: string
     email: string
     status: UserStatus
@@ -23,12 +22,11 @@ export interface IUserState {
 }
 
 export interface IUserInfo {
-    id: string
+    _id: string
     name: string
     email: string
     status: UserStatus
     active: boolean
-    currentTaskId: string | null
     timestamp: number
     lastUpdateTimestamp?: number
     keywords?: string[]
@@ -41,7 +39,6 @@ export interface IUserPost {
     password: string
     status: UserStatus
     active: boolean
-    currentTaskId: string | null
     keywords: string[]
 }
 
