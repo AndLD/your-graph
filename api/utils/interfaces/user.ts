@@ -1,12 +1,17 @@
+import { ObjectId } from 'mongodb'
+
+export type Subscription = 'free' | 'monthly' | 'yearly'
+
 export interface IUser {
-    _id: string
+    _id: ObjectId
     name: string
     email: string
     password: string
     status: UserStatus
     active: boolean
-    timestamp: number
-    lastUpdateTimestamp?: number
+    subscription: Subscription
+    createdAt: number
+    updatedAt?: number
     keywords: string[]
     user: string
 }
@@ -17,8 +22,9 @@ export interface IUserState {
     email: string
     status: UserStatus
     active: boolean
-    timestamp: number
-    lastUpdateTimestamp?: number
+    subscription: Subscription
+    createdAt: number
+    updatedAt?: number
 }
 
 export interface IUserInfo {
@@ -27,8 +33,9 @@ export interface IUserInfo {
     email: string
     status: UserStatus
     active: boolean
-    timestamp: number
-    lastUpdateTimestamp?: number
+    subscription: Subscription
+    createdAt: number
+    updatedAt?: number
     keywords?: string[]
     user?: string
 }
@@ -37,6 +44,7 @@ export interface IUserPost {
     name: string
     email: string
     password: string
+    subscription: Subscription
     status: UserStatus
     active: boolean
     keywords: string[]

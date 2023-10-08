@@ -12,6 +12,10 @@ import useLayoutContext from '../hooks/pages/layout'
 export default function AppRoutes() {
     const token = useToken()
 
+    const [lastOpenedCluster, setLastOpenedCluster] = useState<string | null>(
+        localStorage.getItem('lastOpenedCluster')
+    )
+
     const [routes, setRoutes] = useState<RouteObject[]>([])
     const [redirectRoute, setRedirectRoute] = useState<string | null>(null)
 
@@ -35,20 +39,22 @@ export default function AppRoutes() {
                     setRedirectRoute('/admin')
                     break
                 case 'user':
-                    setRoutes(
-                        privateRoutes.filter(
-                            (route) => route.path === '/cluster'
-                        )
-                    )
-                    setRedirectRoute('/cluster')
+                    setRoutes(privateRoutes)
+
+                    // if (lastOpenedCluster) {
+                    //     setRedirectRoute(`/cluster/${lastOpenedCluster}`)
+                    // } else {
+                    setRedirectRoute('/clusters')
+                    // }
                     break
                 case 'unlimited':
-                    setRoutes(
-                        privateRoutes.filter(
-                            (route) => route.path === '/cluster'
-                        )
-                    )
-                    setRedirectRoute('/cluster')
+                    setRoutes(privateRoutes)
+
+                    // if (lastOpenedCluster) {
+                    //     setRedirectRoute(`/cluster/${lastOpenedCluster}`)
+                    // } else {
+                    setRedirectRoute('/clusters')
+                    // }
                     break
                 default:
                     // setRoutes([{ path: '/forbidden', element: <Forbidden /> }])

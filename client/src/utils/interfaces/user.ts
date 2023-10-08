@@ -1,3 +1,5 @@
+export type Subscription = 'free' | 'monthly' | 'yearly'
+
 export interface IUser {
     _id: string
     name: string
@@ -5,8 +7,9 @@ export interface IUser {
     password: string
     status: UserStatus
     active: boolean
-    timestamp: number
-    lastUpdateTimestamp?: number
+    subscription: Subscription
+    createdAt: number
+    updatedAt?: number
     keywords: string[]
     user: string
 }
@@ -17,8 +20,9 @@ export interface IUserState {
     email: string
     status: UserStatus
     active: boolean
-    timestamp: number
-    lastUpdateTimestamp?: number
+    subscription: Subscription
+    createdAt: number
+    updatedAt?: number
 }
 
 export interface IUserInfo {
@@ -27,8 +31,9 @@ export interface IUserInfo {
     email: string
     status: UserStatus
     active: boolean
-    timestamp: number
-    lastUpdateTimestamp?: number
+    subscription: Subscription
+    createdAt: number
+    updatedAt?: number
     keywords?: string[]
     user?: string
 }
@@ -39,7 +44,8 @@ export interface IUserPost {
     password: string
     status: UserStatus
     active: boolean
-    timestamp: number
+    subscription: Subscription
+    createdAt: number
     keywords: string[]
 }
 

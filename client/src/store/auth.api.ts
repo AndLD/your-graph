@@ -17,7 +17,7 @@ export const authApi = createApi({
         }),
         refreshToken: builder.mutation<IRefreshPostResponse, void>({
             query: () => ({
-                method: 'POST',
+                method: 'GET',
                 url: '/api/public/auth/refresh',
             }),
         }),

@@ -1,7 +1,11 @@
 import { Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { tryCatch } from '../../utils/decorators'
-import { IUserState, IUserPostBody } from '../../utils/interfaces/user'
+import {
+    IUserState,
+    IUserPostBody,
+    IUserPost,
+} from '../../utils/interfaces/user'
 import {
     createEmailVerificationJwt,
     createJwt,
@@ -29,13 +33,14 @@ async function postUser(req: any, res: Response) {
     }
 
     const userState: IUserState = {
-        _id: createdUser._id,
+        _id: createdUser._id.toString(),
         name: createdUser.name,
         email: createdUser.email,
         status: createdUser.status,
         active: createdUser.active,
-        timestamp: createdUser.timestamp,
-        lastUpdateTimestamp: createdUser.lastUpdateTimestamp,
+        subscription: createdUser.subscription,
+        createdAt: createdUser.createdAt,
+        updatedAt: createdUser.updatedAt,
     }
 
     const tokens = createJwt(userState)

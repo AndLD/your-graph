@@ -1,6 +1,5 @@
 import { Dayjs } from 'dayjs'
-
-export type ID = string
+import { ID } from '../types'
 
 export interface INodeBackend {
     _id: ID
@@ -9,6 +8,7 @@ export interface INodeBackend {
     startDate?: string | null
     endDate?: string | null
     tags?: string[]
+    sourceIds?: string[]
     image?: string
     color?: string
 }
@@ -21,6 +21,16 @@ export interface INodeFormValues {
     startDate?: string | null
     endDate?: string | null
     tags?: string[]
+}
+
+export interface INodePut {
+    title?: string
+    color?: string
+    description?: string
+    startDate?: string | null
+    endDate?: string | null
+    tags?: string[]
+    sourceIds?: string[]
 }
 
 export interface INode {
@@ -40,41 +50,4 @@ export interface INode {
     sourceIds?: string[]
     x?: number
     y?: number
-}
-
-export interface IConnection {
-    id: ID
-    from: ID
-    to: ID
-}
-export interface IConnectionBackend {
-    _id: ID
-    from: ID
-    to: ID
-}
-
-export interface ISelectEvent {
-    nodes: ID[]
-    edges: ID[]
-    event: any
-}
-
-export interface IHoverEvent {
-    node: string
-}
-
-export interface IStabilizedEvent {
-    iterations: number
-}
-
-export interface ISource {
-    id?: ID
-    title: string
-    link?: string | null
-}
-
-export interface ISourceBackend {
-    _id: ID
-    title: string
-    link?: string | null
 }

@@ -1,12 +1,17 @@
 import Graph from 'react-graph-vis'
 import { useCallback, useContext, useEffect } from 'react'
 import { clusterContext } from '../../context'
-import { IHoverEvent, ISelectEvent, IStabilizedEvent } from '../../helpers/interfaces'
+import {
+    IHoverEvent,
+    ISelectEvent,
+    IStabilizedEvent,
+} from '../../utils/interfaces/_events'
 import axios from 'axios'
-import { Utils } from '../../helpers/utils'
+import { Utils } from '../../utils/utils'
 
 export default function MyGraph() {
     const {
+        clusterId,
         darkThemeEnabledState: [darkThemeEnabled, setDarkThemeEnabled],
         nodesState: [nodes, setNodes],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
@@ -16,17 +21,20 @@ export default function MyGraph() {
         networkState: [network, setNetwork],
         updateConnection,
         deselectNodes,
-        isUpdateNodeFormVisibleState: [isUpdateNodeFormVisible, setIsUpdateNodeFormVisible]
+        isUpdateNodeFormVisibleState: [
+            isUpdateNodeFormVisible,
+            setIsUpdateNodeFormVisible,
+        ],
     } = useContext(clusterContext)
 
     const options = {
         autoResize: true,
         physics: {
             stabilization: true,
-            wind: { x: 0, y: 0 }
+            wind: { x: 0, y: 0 },
         },
         layout: {
-            hierarchical: hierarchicalEnabled
+            hierarchical: hierarchicalEnabled,
         },
         nodes: {
             borderWidth: 4,
@@ -34,26 +42,26 @@ export default function MyGraph() {
             shape: 'dot',
             color: {
                 border: darkThemeEnabled ? '#666666' : '#222222',
-                background: darkThemeEnabled ? '#999999' : '#666666'
+                background: darkThemeEnabled ? '#999999' : '#666666',
             },
-            font: { color: darkThemeEnabled ? '#999999' : '#666666' }
+            font: { color: darkThemeEnabled ? '#999999' : '#666666' },
         },
         edges: {
             color: darkThemeEnabled ? '#999999' : '#666666',
             smooth: {
-                enabled: true
+                enabled: true,
                 // type: 'cubicBezier'
             },
             arrows: {
                 to: {
-                    enabled: true
-                }
-            }
+                    enabled: true,
+                },
+            },
         },
         height: window.innerHeight.toString(),
         interaction: {
-            hover: !hierarchicalEnabled
-        }
+            hover: !hierarchicalEnabled,
+        },
     }
 
     const onEscKeyDown = (event: KeyboardEvent) => {
@@ -80,10 +88,13 @@ export default function MyGraph() {
                     .map((id: string) => ({
                         _id: id,
                         x: nodesObject[id].x,
-                        y: nodesObject[id].y
+                        y: nodesObject[id].y,
                     }))
 
-                await axios.put('/api/nodes', body)
+                await axios.put(
+                    `/api/private/clusters/${clusterId}/nodes`,
+                    body
+                )
             }
         },
         [nodes]
@@ -120,11 +131,14 @@ export default function MyGraph() {
             }
         },
         stabilized: onStabilized,
-        doubleClick: onDoubleClick
+        doubleClick: onDoubleClick,
     }
 
     return (
-        <div className="graph-container" style={{ background: darkThemeEnabled ? '#222222' : 'white' }}>
+        <div
+            className="graph-container"
+            style={{ background: darkThemeEnabled ? '#222222' : 'white' }}
+        >
             <Graph
                 id="myGraph"
                 graph={{
@@ -136,17 +150,22 @@ export default function MyGraph() {
                             node.shape = 'circularImage'
                         }
 
-                        const connections = edges.filter((edge) => edge.from === node.id || edge.to === node.id)
+                        const connections = edges.filter(
+                            (edge) =>
+                                edge.from === node.id || edge.to === node.id
+                        )
 
                         return {
                             ...node,
                             title: node.description,
                             font: { color: node.color },
                             border: node.image ? 4 : 2,
-                            size: node.image ? 20 + connections.length * 1.5 : 15 + connections.length * 1.5
+                            size: node.image
+                                ? 20 + connections.length * 1.5
+                                : 15 + connections.length * 1.5,
                         }
                     }),
-                    edges
+                    edges,
                 }}
                 options={options}
                 events={events}

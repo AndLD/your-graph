@@ -26,7 +26,6 @@ const baseQuery = fetchBaseQuery({
 
         return headers
     },
-    method: 'POST',
 })
 
 export const baseQueryWithRefresh: BaseQueryFn<

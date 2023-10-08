@@ -1,17 +1,18 @@
 import { Button, Tooltip } from 'antd'
 import { useContext, useState, useEffect } from 'react'
-import { clusterContext } from '../../context'
-import { useMessages } from '../../helpers/messages'
+import { clusterContext } from '../../../context'
+import { useMessages } from '../../../utils/messages'
 import axios from 'axios'
-import { INode } from '../../helpers/interfaces'
 import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
+import { INode } from '../../../utils/interfaces/nodes'
 
 export default function AddNodeBtn() {
     const {
+        clusterId,
         nodesState: [nodes, setNodes],
         edgesState: [edges, setEdges],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
-        selectNode
+        selectNode,
     } = useContext(clusterContext)
 
     const [action, setAction] = useState<((param?: any) => any) | null>(null)
@@ -30,7 +31,9 @@ export default function AddNodeBtn() {
         const params: any = {}
 
         if (selectedNodeId) {
-            const { x, y } = nodes.find((node) => node.id === selectedNodeId) as INode
+            const { x, y } = nodes.find(
+                (node) => node.id === selectedNodeId
+            ) as INode
             if (x) {
                 body.x = x
             }
@@ -43,7 +46,7 @@ export default function AddNodeBtn() {
 
         // Make a POST request to add an empty node
         axios
-            .post('/api/nodes', body, { params })
+            .post(`/api/private/clusters/${clusterId}/nodes`, body, { params })
             .then((response) => {
                 successMessage()
                 const { _id: nodeId, ...rest } = response.data.node
@@ -52,7 +55,8 @@ export default function AddNodeBtn() {
                 setNodes([...nodes, { id: nodeId, ...rest }])
 
                 if (selectedNodeId) {
-                    const { _id: connectionId, ...rest } = response.data.connection
+                    const { _id: connectionId, ...rest } =
+                        response.data.connection
 
                     setEdges([...edges, { id: connectionId, ...rest }])
                     setAction(() => {
@@ -70,7 +74,13 @@ export default function AddNodeBtn() {
         <div style={{ margin: 10 }}>
             {contextHolder}
             {selectedNodeId ? (
-                <div style={{ width: 91.95, display: 'flex', justifyContent: 'space-between' }}>
+                <div
+                    style={{
+                        width: 91.95,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                    }}
+                >
                     <Tooltip title="Add parent">
                         <Button
                             style={{ width: 40 }}

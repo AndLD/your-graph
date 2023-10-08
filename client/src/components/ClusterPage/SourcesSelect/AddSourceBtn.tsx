@@ -1,8 +1,8 @@
 import { PlusOutlined } from '@ant-design/icons'
 import { FormInstance } from 'antd'
 import { usePostSource } from '../../../hooks/sources'
-import { LINE_SPLITTER } from '../../../helpers/constants'
-import { useMessages } from '../../../helpers/messages'
+import { LINE_SPLITTER } from '../../../utils/constants'
+import { useMessages } from '../../../utils/messages'
 
 interface IAddSourceBtnProps {
     form: FormInstance<any>
@@ -11,13 +11,16 @@ interface IAddSourceBtnProps {
 
 export default function AddSourceBtn({
     form,
-    newSourceTitleState: [newSourceTitle, setNewSourceTitle]
+    newSourceTitleState: [newSourceTitle, setNewSourceTitle],
 }: IAddSourceBtnProps) {
     const { errorMessage, contextHolder } = useMessages()
 
     const postSource = usePostSource((newSourceId: string) => {
         setNewSourceTitle('')
-        form.setFieldValue('sourceIds', [...form.getFieldValue('sourceIds'), newSourceId])
+        form.setFieldValue('sourceIds', [
+            ...form.getFieldValue('sourceIds'),
+            newSourceId,
+        ])
     })
 
     return (

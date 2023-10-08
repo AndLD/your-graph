@@ -1,6 +1,6 @@
 import { RouteObject } from 'react-router-dom'
 import Cluster from '../pages/Cluster'
-import Authorized from '../pages/Authorized'
+import Clusters from '../pages/Clusters'
 // import Dashboard from '../pages/Dashboard'
 // import AdminLayout from '../components/AdminLayout'
 // import Settings from '../pages/Settings'
@@ -16,10 +16,6 @@ const privateRoutes: RouteObject[] = [
     //         //     element: <Dashboard />
     //         // },
     //         // {
-    //         //     path: '/admin',
-    //         //     element: <Dashboard />
-    //         // },
-    //         // {
     //         //     path: '/admin/users',
     //         //     element: <Users />
     //         // },
@@ -30,12 +26,14 @@ const privateRoutes: RouteObject[] = [
     //     ]
     // },
     {
-        path: '/cluster',
-        element: <Cluster />,
-    },
-    {
-        path: '/authorized',
-        element: <Authorized />,
+        path: '/clusters',
+        element: <Clusters />,
+        children: [
+            {
+                path: ':id',
+                element: <Cluster />,
+            },
+        ],
     },
 ]
 

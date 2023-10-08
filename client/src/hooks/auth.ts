@@ -18,7 +18,6 @@ export function useAuth() {
     useEffect(() => {
         if (token) {
             if (isJwtExpired(token)) {
-                console.log(11)
                 refreshToken()
             } else {
                 dispatch(appSlice.actions.setToken(token))

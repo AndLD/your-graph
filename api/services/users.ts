@@ -15,16 +15,20 @@ import {
 import { getKeywords } from '../utils/keywords'
 import { getLogger } from '../utils/logger'
 import { db } from './db'
-import { ObjectId } from 'mongodb'
+import { Document, FindCursor, ObjectId, WithId } from 'mongodb'
 
 const logger = getLogger('services/users')
 
 const entity = entities.USERS
 
 async function countUsersByState(res: Response) {
-    const raws = (await db
+    const raws: {
+        _id: ObjectId
+        status?: UserStatus
+    }[] = await db
         .collection(entity)
-        .find({}, { projection: { status: 1 } })) as { status: UserStatus }[]
+        .find({}, { projection: { status: 1 } })
+        .toArray()
 
     const users = {
         admin: 0,
@@ -42,7 +46,7 @@ async function countUsersByState(res: Response) {
 }
 
 async function getRootUser() {
-    const rootUser: IUser = await db
+    const rootUser: WithId<Document> | null = await db
         .collection(entities.USERS)
         .findOne({ email: rootUserConfig.email })
 
@@ -62,7 +66,7 @@ async function getRootUser() {
         return user
     }
 
-    return rootUser
+    return rootUser as IUser
 }
 
 // If 'res' argument not spesified, the function will add user with 'admin' status
@@ -77,6 +81,7 @@ async function addUser(
         password: hashedPassword,
         status: res ? 'user' : 'admin',
         active: !res,
+        subscription: 'free',
         keywords: getKeywords(body.email, body.name),
     }
 
@@ -114,12 +119,14 @@ async function activateUser(userId: string, res: Response) {
 
 // Delete inactive users older 24 hours
 async function deleteInactiveUsers() {
-    await db.collection(entity).deleteMany({
+    const result = await db.collection(entity).deleteMany({
         active: false,
-        timestamp: { $lt: Date.now() - 24 * 60 * 60 * 1000 },
+        createdAt: { $lt: Date.now() - 24 * 60 * 60 * 1000 },
     })
 
-    logger.info('Deleted inactive users older 24 hours')
+    logger.info(
+        `Cron: Deleted inactive users older 24 hours: ${result.deletedCount}`
+    )
 }
 
 export const usersService = {

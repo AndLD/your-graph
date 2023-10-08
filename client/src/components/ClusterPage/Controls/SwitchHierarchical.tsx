@@ -1,10 +1,10 @@
 import { Switch, Tooltip } from 'antd'
-import { clusterContext } from '../../context'
+import { clusterContext } from '../../../context'
 import { useContext } from 'react'
 
 export default function SwitchHierarchical() {
     const {
-        hierarchicalEnabledState: [hierarchicalEnabled, setHierarchinalEnabled]
+        hierarchicalEnabledState: [hierarchicalEnabled, setHierarchinalEnabled],
     } = useContext(clusterContext)
 
     const onChange = () => {

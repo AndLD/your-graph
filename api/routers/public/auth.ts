@@ -10,5 +10,5 @@ export default Router()
         authPublicControllers.postLogin
     )
     // Refresh access token
-    .post('/refresh', authPublicControllers.postRefresh)
+    .get('/refresh', authPublicControllers.getRefresh)
     .post('/logout', authPublicControllers.postLogout)

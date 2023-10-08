@@ -4,6 +4,7 @@ import adminReducer from './admin.reducer'
 import { privateUsersApi, publicUsersApi } from './users.api'
 import { authApi } from './auth.api'
 import { statisticsApi } from './statistics.api'
+import { clustersApi } from './clusters.api'
 
 const rootReducer = combineReducers({
     appReducer,
@@ -11,7 +12,8 @@ const rootReducer = combineReducers({
     [authApi.reducerPath]: authApi.reducer,
     [privateUsersApi.reducerPath]: privateUsersApi.reducer,
     [publicUsersApi.reducerPath]: publicUsersApi.reducer,
-    [statisticsApi.reducerPath]: statisticsApi.reducer
+    [statisticsApi.reducerPath]: statisticsApi.reducer,
+    [clustersApi.reducerPath]: clustersApi.reducer,
 })
 
 export const setupStore = () => {
@@ -22,9 +24,10 @@ export const setupStore = () => {
                 authApi.middleware,
                 privateUsersApi.middleware,
                 publicUsersApi.middleware,
-                statisticsApi.middleware
+                statisticsApi.middleware,
+                clustersApi.middleware
             )
-        }
+        },
     })
 }
 

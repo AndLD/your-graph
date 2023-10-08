@@ -3,8 +3,7 @@ import { DefaultOptionType } from 'antd/es/cascader'
 import { BaseOptionType } from 'antd/es/select'
 import { useContext, useEffect, useState } from 'react'
 import { clusterContext } from '../../context'
-import { ID } from '../../helpers/interfaces'
-import { WarningOutlined } from '@ant-design/icons'
+import { ID } from '../../utils/types'
 
 interface IApplicableKey {
     id: ID
@@ -18,13 +17,15 @@ export default function SearchContainer() {
         nodesState: [nodes, setNodes],
         selectNode,
         selectedNodeIdState: [selectedNodeId],
-        updateConnection
+        updateConnection,
     } = useContext(clusterContext)
 
     const [applicableKeys, setApplicableKeys] = useState<IApplicableKey[]>([])
 
     const [value, setValue] = useState<string>('')
-    const [options, setOptions] = useState<(BaseOptionType | DefaultOptionType)[]>([])
+    const [options, setOptions] = useState<
+        (BaseOptionType | DefaultOptionType)[]
+    >([])
 
     useEffect(() => {
         setApplicableKeys(
@@ -33,14 +34,19 @@ export default function SearchContainer() {
                 title: node.title,
                 tags: node.tags,
                 keys: [
-                    ...(node.title ? [...node.title.toLowerCase().split(' ')] : []),
-                    ...(node.tags?.map((tag) => tag.toLowerCase()) || [])
-                ]
+                    ...(node.title
+                        ? [...node.title.toLowerCase().split(' ')]
+                        : []),
+                    ...(node.tags?.map((tag: string) => tag.toLowerCase()) ||
+                        []),
+                ],
             }))
         )
     }, [nodes])
 
-    function getPanelValue(text: string): (BaseOptionType | DefaultOptionType)[] {
+    function getPanelValue(
+        text: string
+    ): (BaseOptionType | DefaultOptionType)[] {
         return applicableKeys
             .filter((node) => {
                 if (node.title?.includes(text)) {
@@ -66,7 +72,7 @@ export default function SearchContainer() {
                         </div>
                     </>
                 ),
-                value: node.id
+                value: node.id,
             }))
     }
 
@@ -77,7 +83,9 @@ export default function SearchContainer() {
                 options={options}
                 value={value}
                 onChange={setValue}
-                onSearch={(text) => setOptions(getPanelValue(text.toLowerCase()))}
+                onSearch={(text) =>
+                    setOptions(getPanelValue(text.toLowerCase()))
+                }
                 onSelect={(id: string) => {
                     setValue('')
                     if (selectedNodeId) {

@@ -1,10 +1,10 @@
 import { Switch, Tooltip } from 'antd'
-import { clusterContext } from '../../context'
+import { clusterContext } from '../../../context'
 import { useContext } from 'react'
 
 export default function SwitchDarkTheme() {
     const {
-        darkThemeEnabledState: [darkThemeEnabled, setDarkThemeEnabled]
+        darkThemeEnabledState: [darkThemeEnabled, setDarkThemeEnabled],
     } = useContext(clusterContext)
 
     const onChange = () => {

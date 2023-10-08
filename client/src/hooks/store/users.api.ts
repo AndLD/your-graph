@@ -35,9 +35,7 @@ export function useVerifyEmail(
     })
 
     useEffect(() => {
-        console.log('000')
         if (fetchVerifyEmailQuery.isSuccess) {
-            console.log('111')
             callback()
         }
     }, [fetchVerifyEmailQuery.isSuccess])

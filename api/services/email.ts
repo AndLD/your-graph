@@ -11,7 +11,9 @@ const EMAIL_SMTP_PASS = process.env.EMAIL_SMTP_PASS
 
 async function init() {
     if (!EMAIL_SMTP_USER || !EMAIL_SMTP_PASS) {
-        logger.error('Email Service initialization failed: EMAIL_SMTP_USER or EMAIL_SMTP_PASS not found')
+        logger.error(
+            'Email Service initialization failed: EMAIL_SMTP_USER or EMAIL_SMTP_PASS not found'
+        )
         return
     }
 
@@ -21,14 +23,17 @@ async function init() {
         secure: true,
         auth: {
             user: EMAIL_SMTP_USER,
-            pass: EMAIL_SMTP_PASS
-        }
+            pass: EMAIL_SMTP_PASS,
+        },
     })
 
     logger.info('Email Services successfully initialized.')
 }
 
-async function sendEmailVerification(email: string, emailVerificationToken: string) {
+async function sendEmailVerification(
+    email: string,
+    emailVerificationToken: string
+) {
     if (!transporter) {
         return
     }
@@ -38,16 +43,24 @@ async function sendEmailVerification(email: string, emailVerificationToken: stri
     await _sendMail({ email, subject: 'Email Verification', html })
 }
 
-async function _sendMail({ email, subject, html }: { email: string; subject: string; html: string }) {
+async function _sendMail({
+    email,
+    subject,
+    html,
+}: {
+    email: string
+    subject: string
+    html: string
+}) {
     if (!transporter) {
         return
     }
 
     await transporter.sendMail({
-        from: `Law Quest <${EMAIL_SMTP_USER}>`,
+        from: `Your Graph <${EMAIL_SMTP_USER}>`,
         to: email,
         subject,
-        html
+        html,
     })
 }
 
@@ -58,5 +71,5 @@ function stop() {
 export const emailService = {
     init,
     sendEmailVerification,
-    stop
+    stop,
 }

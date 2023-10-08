@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 import { clusterContext } from '../../context'
-import { INode } from '../../helpers/interfaces'
+import { INode } from '../../utils/interfaces/nodes'
 
 export default function ImageContainer() {
     const {
         nodesState: [nodes, setNodes],
-        hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId]
+        hoveredNodeIdState: [hoveredNodeId, setHoveredNodeId],
     } = useContext(clusterContext)
 
     const [hoveredNode, setHoveredNode] = useState<INode | null>(null)

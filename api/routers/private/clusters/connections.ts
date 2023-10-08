@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { connectionsControllers } from '../controllers/connections'
+import { connectionsControllers } from '../../../controllers/clusters/connections'
 
 export const connectionsRouter = Router()
     .get('/', connectionsControllers.get)

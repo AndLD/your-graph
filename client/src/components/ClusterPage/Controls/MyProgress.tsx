@@ -1,6 +1,6 @@
 import { Progress, Tooltip } from 'antd'
 import { useContext } from 'react'
-import { clusterContext } from '../../context'
+import { clusterContext } from '../../../context'
 
 function calculateUpBorder(value: number) {
     const base = 500
@@ -15,8 +15,7 @@ function calculateUpBorder(value: number) {
 
 export default function MyProgress() {
     const {
-        darkThemeEnabledState: [darkThemeEnabled, setDarkThemeEnabled],
-        nodesState: [nodes, setNodes]
+        nodesState: [nodes, setNodes],
     } = useContext(clusterContext)
 
     const upBorder = calculateUpBorder(nodes.length)

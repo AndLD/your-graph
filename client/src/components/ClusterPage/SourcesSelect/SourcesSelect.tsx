@@ -4,8 +4,8 @@ import EditSourceInput from './EditSourceInput'
 import NewSourceInput from './NewSourceInput'
 import Source from './Source'
 import { clusterContext } from '../../../context'
-import { ID, ISource } from '../../../helpers/interfaces'
-import { WarningOutlined } from '@ant-design/icons'
+import { ID } from '../../../utils/types'
+import { ISource } from '../../../utils/interfaces/sources'
 
 interface ISourcesStateProps {
     form: FormInstance<any>
@@ -14,10 +14,19 @@ interface ISourcesStateProps {
     required?: boolean
 }
 
-export default function SourcesSelect({ form, value, onChange, required }: ISourcesStateProps) {
+export default function SourcesSelect({
+    form,
+    value,
+    onChange,
+    required,
+}: ISourcesStateProps) {
     const [sources, setSources] = useContext(clusterContext).sourcesState
     const [newSourceTitle, setNewSourceTitle] = useState('')
-    const [sourceEdit, setSourceEdit] = useState<{ id: string; newTitle: string; title: string } | null>(null)
+    const [sourceEdit, setSourceEdit] = useState<{
+        id: string
+        newTitle: string
+        title: string
+    } | null>(null)
     const [isOpen, setIsOpen] = useState(false)
     const [isSourceControlsHover, setIsSourceControlsHover] = useState(false)
     const [options, setOptions] = useState<
@@ -40,9 +49,17 @@ export default function SourcesSelect({ form, value, onChange, required }: ISour
             <Divider style={{ margin: 0 }} />
             <div style={{ padding: 8 }}>
                 {sourceEdit ? (
-                    <EditSourceInput sourceEditState={[sourceEdit, setSourceEdit]} />
+                    <EditSourceInput
+                        sourceEditState={[sourceEdit, setSourceEdit]}
+                    />
                 ) : (
-                    <NewSourceInput form={form} newSourceTitleState={[newSourceTitle, setNewSourceTitle]} />
+                    <NewSourceInput
+                        form={form}
+                        newSourceTitleState={[
+                            newSourceTitle,
+                            setNewSourceTitle,
+                        ]}
+                    />
                 )}
             </div>
         </div>
@@ -63,7 +80,7 @@ export default function SourcesSelect({ form, value, onChange, required }: ISour
                         setSourceEdit={setSourceEdit}
                         form={form}
                     />
-                )
+                ),
             }))
         )
     }, [sources, isSourceControlsHover, isOpen, sourceEdit])

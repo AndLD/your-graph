@@ -8,7 +8,7 @@ import { entities, errors } from '../../utils/constants'
 import { IUser, IUserState } from '../../utils/interfaces/user'
 import { createJwt, refreshJwtSecret } from '../../utils/jwt'
 import { apiUtils } from '../../utils/api'
-import { ObjectId } from 'mongodb'
+import { Document, ObjectId, WithId } from 'mongodb'
 
 interface IRefreshJwtPayload extends jwt.JwtPayload {
     user: {
@@ -19,7 +19,7 @@ interface IRefreshJwtPayload extends jwt.JwtPayload {
 async function postLogin(req: any, res: Response) {
     const body: IAuthPostBody = req.body
 
-    const user: IUser = await db
+    const user: WithId<Document> | null = await db
         .collection(entities.USERS)
         .findOne({ email: body.email })
 
@@ -36,13 +36,14 @@ async function postLogin(req: any, res: Response) {
 
     // JWT
     const userState: IUserState = {
-        _id: user._id,
+        _id: user._id.toString(),
         name: user.name,
         email: user.email,
         status: user.status,
         active: user.active,
-        timestamp: user.timestamp,
-        lastUpdateTimestamp: user.lastUpdateTimestamp,
+        subscription: user.subscription,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
     }
 
     const tokens = createJwt(userState)
@@ -53,10 +54,8 @@ async function postLogin(req: any, res: Response) {
     })
 }
 
-async function postRefresh(req: any, res: Response) {
+async function getRefresh(req: any, res: Response) {
     const refreshToken = req.cookies.refreshToken
-
-    console.log('refreshToken', refreshToken)
 
     if (!refreshToken) {
         return apiUtils.sendError(res, errors.UNABLE_TO_REFRESH_ACCESS_JWT)
@@ -75,28 +74,25 @@ async function postRefresh(req: any, res: Response) {
         throw new Error('decodeValue.user is empty!')
     }
 
-    console.log('decodeValue.user', decodeValue.user)
-
     const userId = decodeValue.user._id
 
     const user = await db
         .collection(entities.USERS)
         .findOne({ _id: new ObjectId(userId) })
 
-    console.log('user', user)
-
     if (!user) {
         return res.sendStatus(401)
     }
 
     const userState: IUserState = {
-        _id: user._id,
+        _id: user._id.toString(),
         name: user.name,
         email: user.email,
         status: user.status,
         active: user.active,
-        timestamp: user.timestamp,
-        lastUpdateTimestamp: user.lastUpdateTimestamp,
+        subscription: user.subscription,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
     }
 
     const tokens = createJwt(userState)
@@ -112,6 +108,6 @@ async function postLogout(_: any, res: Response) {
 
 export const authPublicControllers = {
     postLogin: tryCatch(postLogin),
-    postRefresh: tryCatch(postRefresh),
+    getRefresh: tryCatch(getRefresh),
     postLogout: tryCatch(postLogout),
 }

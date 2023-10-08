@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { INode } from './interfaces'
+import { INode } from './interfaces/nodes'
 
 export const Utils = {
     randomInteger(min: number, max: number) {
@@ -12,9 +12,16 @@ export const Utils = {
             node.title +
             (node.startDate
                 ? '\n' +
-                  dayjs(node.startDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString() +
-                  (node.endDate ? ' - ' + dayjs(node.endDate, 'DD.MM.YYYY').format('DD.MM.YYYY').toString() : '')
+                  dayjs(node.startDate, 'DD.MM.YYYY')
+                      .format('DD.MM.YYYY')
+                      .toString() +
+                  (node.endDate
+                      ? ' - ' +
+                        dayjs(node.endDate, 'DD.MM.YYYY')
+                            .format('DD.MM.YYYY')
+                            .toString()
+                      : '')
                 : '')
         )
-    }
+    },
 }

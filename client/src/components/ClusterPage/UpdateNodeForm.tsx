@@ -5,18 +5,20 @@ import { useForm } from 'antd/es/form/Form'
 import EditableTags from './EditableTags'
 import axios from 'axios'
 import { clusterContext } from '../../context'
-import { useMessages } from '../../helpers/messages'
+import { useMessages } from '../../utils/messages'
 import dayjs from 'dayjs'
-import { INode, INodeBackend } from '../../helpers/interfaces'
 import SourcesSelect from './SourcesSelect/SourcesSelect'
+import { INode, INodeBackend } from '../../utils/interfaces/nodes'
+import { API_URL } from '../../utils/constants'
 
 const { Dragger } = Upload
 
 export default function UpdateNodeForm() {
     const {
+        clusterId,
         nodesState: [nodes, setNodes],
         edgesState: [edges, setEdges],
-        selectedNodeIdState: [selectedNodeId, setSelectedNodeId]
+        selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
     } = useContext(clusterContext)
 
     const updateBtnRef = useRef<HTMLElement>(null)
@@ -47,7 +49,9 @@ export default function UpdateNodeForm() {
         setFileList([])
 
         if (selectedNodeId) {
-            const selectedNode = nodes.find((node) => node.id === selectedNodeId)
+            const selectedNode = nodes.find(
+                (node) => node.id === selectedNodeId
+            )
 
             if (selectedNode) {
                 const newFieldsValue = {
@@ -56,12 +60,18 @@ export default function UpdateNodeForm() {
                     description: selectedNode.description,
                     color: selectedNode.color,
                     tags: selectedNode.tags,
-                    startDate: selectedNode.startDate ? dayjs(selectedNode.startDate, 'DD.MM.YYYY') : undefined,
-                    endDate: selectedNode.endDate ? dayjs(selectedNode.endDate, 'DD.MM.YYYY') : undefined,
-                    sourceIds: selectedNode.sourceIds
+                    startDate: selectedNode.startDate
+                        ? dayjs(selectedNode.startDate, 'DD.MM.YYYY')
+                        : undefined,
+                    endDate: selectedNode.endDate
+                        ? dayjs(selectedNode.endDate, 'DD.MM.YYYY')
+                        : undefined,
+                    sourceIds: selectedNode.sourceIds,
                 }
                 if ((newFieldsValue.color as any)?.toHexString) {
-                    newFieldsValue.color = (newFieldsValue.color as any).toHexString()
+                    newFieldsValue.color = (
+                        newFieldsValue.color as any
+                    ).toHexString()
                 }
                 form.setFieldsValue(newFieldsValue)
             }
@@ -94,7 +104,7 @@ export default function UpdateNodeForm() {
             })
 
             if (fileList.length) setFileList(fileList)
-        }
+        },
     }
 
     function updateNode() {
@@ -125,8 +135,12 @@ export default function UpdateNodeForm() {
             if (data.sourceIds) {
                 data.sourceIds = JSON.stringify(data.sourceIds)
             }
-            data.startDate = data.startDate ? data.startDate.format('DD.MM.YYYY') : null
-            data.endDate = data.endDate ? data.endDate.format('DD.MM.YYYY') : null
+            data.startDate = data.startDate
+                ? data.startDate.format('DD.MM.YYYY')
+                : null
+            data.endDate = data.endDate
+                ? data.endDate.format('DD.MM.YYYY')
+                : null
 
             Object.keys(data).forEach((key) => {
                 if (data[key] !== undefined && key !== 'id') {
@@ -139,11 +153,15 @@ export default function UpdateNodeForm() {
             }
 
             try {
-                const response = await axios.put(`http://localhost:8080/api/nodes/${selectedNodeId}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
+                const response = await axios.put(
+                    `${API_URL}/api/private/clusters/${clusterId}/nodes/${selectedNodeId}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
                     }
-                })
+                )
 
                 const updatedNode = response.data as INodeBackend
 
@@ -153,7 +171,10 @@ export default function UpdateNodeForm() {
                     nodes.map((node) => {
                         if (node.id === selectedNodeId) {
                             const { _id, ...rest } = updatedNode
-                            const newNode: INode = { id: selectedNodeId, ...rest }
+                            const newNode: INode = {
+                                id: selectedNodeId,
+                                ...rest,
+                            }
 
                             if (updatedNode.image) {
                                 newNode.image = `/images/${selectedNodeId}${updatedNode.image}`
@@ -181,7 +202,9 @@ export default function UpdateNodeForm() {
         }
 
         axios
-            .delete(`http://localhost:8080/api/nodes/${selectedNodeId}`)
+            .delete(
+                `${API_URL}/api/private/clusters/${clusterId}/nodes/${selectedNodeId}`
+            )
             .then((response) => {
                 // Handle successful deletion
                 successMessage()
@@ -190,7 +213,13 @@ export default function UpdateNodeForm() {
                 setNodes(nodes.filter(({ id }) => id !== selectedNodeId))
 
                 // Remove any edges connected to the deleted node
-                setEdges(edges.filter((edge) => edge.from !== selectedNodeId || edge.to !== selectedNodeId))
+                setEdges(
+                    edges.filter(
+                        (edge) =>
+                            edge.from !== selectedNodeId ||
+                            edge.to !== selectedNodeId
+                    )
+                )
 
                 setSelectedNodeId(null)
             })
@@ -210,15 +239,17 @@ export default function UpdateNodeForm() {
         <div className="form-container">
             {contextHolder}
             <Form form={form}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                     <Form.Item
                         style={{ width: '85%' }}
                         name="title"
                         rules={[
                             {
                                 required: true,
-                                whitespace: true
-                            }
+                                whitespace: true,
+                            },
                         ]}
                     >
                         <Input placeholder="Title" />
@@ -230,10 +261,16 @@ export default function UpdateNodeForm() {
                 </div>
 
                 <Form.Item name="description">
-                    <Input.TextArea showCount={true} placeholder="Description" style={{ height: 100 }} />
+                    <Input.TextArea
+                        showCount={true}
+                        placeholder="Description"
+                        style={{ height: 100 }}
+                    />
                 </Form.Item>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
                     <Form.Item name="startDate" style={{ width: '47%' }}>
                         <DatePicker placeholder="Start" format="DD.MM.YYYY" />
                     </Form.Item>
@@ -258,7 +295,9 @@ export default function UpdateNodeForm() {
                         <p className="ant-upload-drag-icon">
                             <UploadOutlined />
                         </p>
-                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                        <p className="ant-upload-text">
+                            Click or drag file to this area to upload
+                        </p>
                     </Dragger>
                 </Form.Item>
 

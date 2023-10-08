@@ -1,18 +1,31 @@
 import { useEffect, useState } from 'react'
+import axios from 'axios'
+import dayjs from 'dayjs'
+import { ID } from '../../utils/types'
+import { INode, INodeBackend } from '../../utils/interfaces/nodes'
 import {
     IConnection,
     IConnectionBackend,
-    ID,
-    INode,
-    INodeBackend,
-    ISource,
-    ISourceBackend
-} from '../helpers/interfaces'
-import axios from 'axios'
-import dayjs from 'dayjs'
+} from '../../utils/interfaces/connections'
+import { ISource, ISourceBackend } from '../../utils/interfaces/sources'
+import { ICluster } from '../../utils/interfaces/clusters'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export default function useClusterContextValue() {
-    const darkThemeEnabledState = useState(JSON.parse(localStorage.getItem('darkThemeEnabled') || 'false'))
+    const navigate = useNavigate()
+
+    const darkThemeEnabledState = useState(
+        JSON.parse(localStorage.getItem('darkThemeEnabled') || 'false')
+    )
+
+    const clusterId = useParams().id
+
+    if (clusterId) {
+        localStorage.setItem('lastOpenedCluster', clusterId)
+    }
+
+    const clusterState = useState<ICluster | null>(null)
+
     const selectedNodeIdState = useState<null | ID>(null)
     const hoveredNodeIdState = useState<null | ID>(null)
 
@@ -28,24 +41,44 @@ export default function useClusterContextValue() {
     const isUpdateNodeFormVisibleState = useState(false)
 
     useEffect(() => {
-        // Fetch nodes from the server
+        if (!clusterId) {
+            return navigate('/clusters')
+        }
+
+        // Fetch whole cluster with all nodes, connections and sources from the server
         axios
-            .get('/api/nodes')
+            .get(`/api/private/clusters/${clusterId}`)
             .then((response) => {
-                const { data }: { data: INodeBackend[] } = response
+                const {
+                    data,
+                }: {
+                    data: {
+                        cluster: ICluster
+                        nodes: INodeBackend[]
+                        connections: IConnectionBackend[]
+                        sources: ISourceBackend[]
+                    }
+                } = response
+
+                // Update the clusterState with the fetched cluster
+                clusterState[1](data.cluster)
+
                 // Update the nodesState with the fetched nodes
                 nodesState[1](
-                    data.map(({ _id, ...node }) => {
+                    data.nodes.map(({ _id, ...node }) => {
                         const modified: INode = {
                             id: _id,
-                            ...node
+                            ...node,
                         }
 
                         if (node.image) {
                             modified.image = `/images/${_id}${node.image}`
                         }
                         if (node.startDate) {
-                            modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
+                            modified.startDate = dayjs(
+                                node.startDate,
+                                'DD.MM.YYYY'
+                            )
                         }
                         if (node.endDate) {
                             modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
@@ -54,33 +87,26 @@ export default function useClusterContextValue() {
                         return modified
                     })
                 )
-            })
-            .catch((error) => {
-                console.error('Failed to fetch nodes:', error)
-            })
 
-        // Fetch connections from the server
-        axios
-            .get('/api/connections')
-            .then((response) => {
-                const { data }: { data: IConnectionBackend[] } = response
                 // Update the edgesState with the fetched connections
-                edgesState[1](data.map(({ _id, ...rest }) => ({ id: _id, ...rest })))
-            })
-            .catch((error) => {
-                console.error('Failed to fetch connections:', error)
-            })
+                edgesState[1](
+                    data.connections.map(({ _id, ...rest }) => ({
+                        id: _id,
+                        ...rest,
+                    }))
+                )
 
-        // Fetch sources from the server
-        axios
-            .get('/api/sources')
-            .then((response) => {
-                const { data }: { data: ISourceBackend[] } = response
                 // Update the edgesState with the fetched connections
-                sourcesState[1](data.map(({ _id, ...rest }) => ({ id: _id, ...rest })))
+                sourcesState[1](
+                    data.sources.map(({ _id, ...rest }) => ({
+                        id: _id,
+                        ...rest,
+                    }))
+                )
             })
             .catch((error) => {
-                console.error('Failed to fetch connections:', error)
+                console.log(error)
+                navigate('/clusters')
             })
     }, [])
 
@@ -110,6 +136,10 @@ export default function useClusterContextValue() {
     }
 
     function updateConnection(to: ID) {
+        if (!clusterId) {
+            return
+        }
+
         const [selectedNodeId] = selectedNodeIdState
         const [edges, setEdges] = edgesState
 
@@ -117,13 +147,16 @@ export default function useClusterContextValue() {
         if (selectedNodeId && selectedNodeId !== to) {
             const connection = edges.find(
                 (edge) =>
-                    (edge.from === selectedNodeId && edge.to === to) || (edge.from === to && edge.to === selectedNodeId)
+                    (edge.from === selectedNodeId && edge.to === to) ||
+                    (edge.from === to && edge.to === selectedNodeId)
             )
 
             // If connection already exists delete it otherwise create
             if (connection) {
                 axios
-                    .delete(`/api/connections/${connection.id}`)
+                    .delete(
+                        `/api/private/clusters/${clusterId}/connections/${connection.id}`
+                    )
                     .then((response) => {
                         // Upon successful deletion, remove from edges state
                         setEdges(edges.filter(({ id }) => id !== connection.id))
@@ -134,7 +167,10 @@ export default function useClusterContextValue() {
             } else {
                 const newConnection = { from: selectedNodeId, to }
                 axios
-                    .post('/api/connections', newConnection)
+                    .post(
+                        `/api/private/clusters/${clusterId}/connections`,
+                        newConnection
+                    )
                     .then((response) => {
                         const { _id, ...rest } = response.data
 
@@ -149,6 +185,7 @@ export default function useClusterContextValue() {
     }
 
     return {
+        clusterId,
         darkThemeEnabledState,
         selectedNodeIdState,
         nodesState,
@@ -160,6 +197,6 @@ export default function useClusterContextValue() {
         sourcesState,
         updateConnection,
         deselectNodes,
-        isUpdateNodeFormVisibleState
+        isUpdateNodeFormVisibleState,
     }
 }

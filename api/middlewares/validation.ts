@@ -7,14 +7,22 @@ import { Collection, Controller, Error } from '../utils/types'
 import { ObjectId } from 'mongodb'
 
 function isEntityExists(entity?: Collection, bodyIdKey?: string) {
-    return tryCatch(async function (req: any, res: Response, next: NextFunction) {
-        const id: string | undefined = bodyIdKey ? req.body[bodyIdKey] : req.params.id
+    return tryCatch(async function (
+        req: any,
+        res: Response,
+        next: NextFunction
+    ) {
+        const id: string | undefined = bodyIdKey
+            ? req.body[bodyIdKey]
+            : req.params.id
 
         if (!id) {
             return next()
         }
 
-        const doc = await db.collection(entity || req.entity).findOne({ _id: new ObjectId(id) })
+        const doc = await db
+            .collection(entity || req.entity)
+            .findOne({ _id: new ObjectId(id) })
 
         if (!doc) {
             return apiUtils.sendError(res, errors.DOC_NOT_FOUND)
@@ -24,8 +32,12 @@ function isEntityExists(entity?: Collection, bodyIdKey?: string) {
     } as Controller)
 }
 
-function isEntitiesExists(entity?: Collection, bodyIdsKey?: string) {
-    return tryCatch(async function (req: any, res: Response, next: NextFunction) {
+function isEntitiesExists(entity: Collection, bodyIdsKey?: string) {
+    return tryCatch(async function (
+        req: any,
+        res: Response,
+        next: NextFunction
+    ) {
         const ids: string[] = bodyIdsKey ? req.body[bodyIdsKey] : req.query.ids
 
         if (!ids?.length) {
@@ -35,7 +47,10 @@ function isEntitiesExists(entity?: Collection, bodyIdsKey?: string) {
         // Convert string IDs to ObjectID
         const objectIds = ids.map((id) => new ObjectId(id))
 
-        const docs = await db.collection(entity).find({ _id: { $in: objectIds } })
+        const docs = await db
+            .collection(entity)
+            .find({ _id: { $in: objectIds } })
+            .toArray()
 
         if (docs.length !== ids.length) {
             return apiUtils.sendError(res, errors.DOC_NOT_FOUND)
@@ -45,8 +60,15 @@ function isEntitiesExists(entity?: Collection, bodyIdsKey?: string) {
     } as Controller)
 }
 
-function isEntityUsed(entity: Collection, getFilterCallback: (req: Request) => any) {
-    return tryCatch(async function (req: Request, res: Response, next: NextFunction) {
+function isEntityUsed(
+    entity: Collection,
+    getFilterCallback: (req: Request) => any
+) {
+    return tryCatch(async function (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
         const filter = getFilterCallback(req)
 
         const doc = await db.collection(entity).findOne(filter)
@@ -59,11 +81,18 @@ function isEntityUsed(entity: Collection, getFilterCallback: (req: Request) => a
     } as Controller)
 }
 
-function isEntityAlreadyExists(entity: Collection, getFilterCallback: (req: Request) => any) {
-    return tryCatch(async function (req: Request, res: Response, next: NextFunction) {
+function isEntityAlreadyExists(
+    entity: Collection,
+    getFilterCallback: (req: Request) => any
+) {
+    return tryCatch(async function (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
         const filter = getFilterCallback(req)
 
-        const docs = await db.collection(entity).find(filter)
+        const docs = await db.collection(entity).find(filter).toArray()
 
         if (docs.length) {
             return apiUtils.sendError(res, errors.ENTITY_ALREADY_EXISTS)
@@ -94,5 +123,5 @@ export const validationMiddlewares = {
     isEntitiesExists,
     isEntityUsed,
     isEntityAlreadyExists,
-    isBodyArrayUnique
+    isBodyArrayUnique,
 }

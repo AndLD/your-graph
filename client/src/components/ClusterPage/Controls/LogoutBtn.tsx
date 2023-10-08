@@ -1,5 +1,5 @@
 import { Button } from 'antd'
-import { useLogout } from '../../hooks/store/auth.api'
+import { useLogout } from '../../../hooks/store/auth.api'
 
 export default function LogoutBtn() {
     const logout = useLogout()
