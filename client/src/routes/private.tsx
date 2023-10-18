@@ -28,12 +28,10 @@ const privateRoutes: RouteObject[] = [
     {
         path: '/clusters',
         element: <Clusters />,
-        children: [
-            {
-                path: ':id',
-                element: <Cluster />,
-            },
-        ],
+    },
+    {
+        path: '/clusters/:id',
+        element: <Cluster />,
     },
 ]
 
