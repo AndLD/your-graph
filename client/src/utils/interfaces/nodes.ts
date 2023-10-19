@@ -11,6 +11,7 @@ export interface INodeBackend {
     sourceIds?: string[]
     image?: string
     color?: string
+    clusterId: ID
 }
 
 export interface INodeFormValues {
@@ -43,6 +44,7 @@ export interface INode {
     tags?: string[]
     image?: string
     color?: string | { border: string; background: string }
+    clusterId: ID
 
     group?: string
     shape?: string

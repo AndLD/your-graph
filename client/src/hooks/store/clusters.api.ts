@@ -1,6 +1,7 @@
 import React, { SetStateAction, useContext, useEffect } from 'react'
 import {
     useDeleteClusterMutation,
+    useFetchClusterQuery,
     useFetchClustersQuery,
     usePostClusterMutation,
     usePutClusterMutation,
@@ -9,6 +10,11 @@ import { ICluster, IClusterPutBody } from '../../utils/interfaces/clusters'
 import { errorNotification } from '../../utils/notifications'
 import { useToken } from '../auth'
 import { clustersContext } from '../../context'
+import { useParams } from 'react-router-dom'
+import { INode } from '../../utils/interfaces/nodes'
+import { IConnection } from '../../utils/interfaces/connections'
+import { ISource } from '../../utils/interfaces/sources'
+import dayjs from 'dayjs'
 
 export function useFetchClusters(
     setClusters: React.Dispatch<SetStateAction<ICluster[]>>
@@ -24,6 +30,59 @@ export function useFetchClusters(
             setClusters(fetchClustersQuery.data)
         }
     }, [fetchClustersQuery.data])
+}
+
+export function useFetchCluster(
+    setCluster: React.Dispatch<SetStateAction<ICluster | null>>,
+    setNodes: React.Dispatch<SetStateAction<INode[]>>,
+    setEdges: React.Dispatch<SetStateAction<IConnection[]>>,
+    setSources: React.Dispatch<SetStateAction<ISource[]>>
+) {
+    const token = useToken()
+
+    const id = useParams().id
+
+    const fetchClusterQuery = id
+        ? useFetchClusterQuery({ id }, { skip: !token })
+        : null
+
+    useEffect(() => {
+        if (fetchClusterQuery && fetchClusterQuery.data) {
+            setCluster(fetchClusterQuery.data.cluster)
+            setNodes(
+                fetchClusterQuery.data.nodes.map(({ _id, ...node }) => {
+                    const modified: INode = {
+                        id: _id,
+                        ...node,
+                    }
+
+                    if (node.image) {
+                        modified.image = `/images/${_id}${node.image}`
+                    }
+                    if (node.startDate) {
+                        modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
+                    }
+                    if (node.endDate) {
+                        modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
+                    }
+
+                    return modified
+                })
+            )
+            setEdges(
+                fetchClusterQuery.data.connections.map(({ _id, ...rest }) => ({
+                    id: _id,
+                    ...rest,
+                }))
+            )
+            setSources(
+                fetchClusterQuery.data.sources.map(({ _id, ...rest }) => ({
+                    id: _id,
+                    ...rest,
+                }))
+            )
+        }
+    }, [fetchClusterQuery?.data])
 }
 
 export function usePostCluster(callback: (newClusterId: string) => void) {

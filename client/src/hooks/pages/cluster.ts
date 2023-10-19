@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import dayjs from 'dayjs'
 import { ID } from '../../utils/types'
-import { INode, INodeBackend } from '../../utils/interfaces/nodes'
-import {
-    IConnection,
-    IConnectionBackend,
-} from '../../utils/interfaces/connections'
-import { ISource, ISourceBackend } from '../../utils/interfaces/sources'
+import { INode } from '../../utils/interfaces/nodes'
+import { IConnection } from '../../utils/interfaces/connections'
+import { ISource } from '../../utils/interfaces/sources'
 import { ICluster } from '../../utils/interfaces/clusters'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useFetchCluster } from '../store/clusters.api'
 
 export default function useClusterContextValue() {
     const navigate = useNavigate()
@@ -40,75 +37,16 @@ export default function useClusterContextValue() {
 
     const isUpdateNodeFormVisibleState = useState(false)
 
-    useEffect(() => {
-        if (!clusterId) {
-            return navigate('/clusters')
-        }
-
-        // Fetch whole cluster with all nodes, connections and sources from the server
-        axios
-            .get(`/api/private/clusters/${clusterId}`)
-            .then((response) => {
-                const {
-                    data,
-                }: {
-                    data: {
-                        cluster: ICluster
-                        nodes: INodeBackend[]
-                        connections: IConnectionBackend[]
-                        sources: ISourceBackend[]
-                    }
-                } = response
-
-                // Update the clusterState with the fetched cluster
-                clusterState[1](data.cluster)
-
-                // Update the nodesState with the fetched nodes
-                nodesState[1](
-                    data.nodes.map(({ _id, ...node }) => {
-                        const modified: INode = {
-                            id: _id,
-                            ...node,
-                        }
-
-                        if (node.image) {
-                            modified.image = `/images/${_id}${node.image}`
-                        }
-                        if (node.startDate) {
-                            modified.startDate = dayjs(
-                                node.startDate,
-                                'DD.MM.YYYY'
-                            )
-                        }
-                        if (node.endDate) {
-                            modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
-                        }
-
-                        return modified
-                    })
-                )
-
-                // Update the edgesState with the fetched connections
-                edgesState[1](
-                    data.connections.map(({ _id, ...rest }) => ({
-                        id: _id,
-                        ...rest,
-                    }))
-                )
-
-                // Update the edgesState with the fetched connections
-                sourcesState[1](
-                    data.sources.map(({ _id, ...rest }) => ({
-                        id: _id,
-                        ...rest,
-                    }))
-                )
-            })
-            .catch((error) => {
-                console.log(error)
-                navigate('/clusters')
-            })
-    }, [])
+    if (!clusterId) {
+        return navigate('/clusters')
+    }
+    // Fetch whole cluster with all nodes, connections and sources from the server
+    useFetchCluster(
+        clusterState[1],
+        nodesState[1],
+        edgesState[1],
+        sourcesState[1]
+    )
 
     useEffect(() => {
         localStorage.setItem('darkThemeEnabled', darkThemeEnabledState[0])

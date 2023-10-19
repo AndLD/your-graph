@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ICluster } from '../../utils/interfaces/clusters'
 import { useFetchClusters } from '../store/clusters.api'
 
