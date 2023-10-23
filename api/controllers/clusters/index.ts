@@ -34,21 +34,15 @@ async function getOneById(
     next: NextFunction
 ) {
     try {
-        const userId = req.user?._id
         const id = req.params.id
 
-        const filter: any = { _id: new ObjectId(id), deleted: false }
+        const cluster =
+            req.middlewarePayload?.item ||
+            (await db
+                .collection(collectionName)
+                .findOne({ _id: new ObjectId(id) }))
 
-        if (userId) {
-            filter.$or = [
-                { userId },
-                { access: 'public', userId: { $not: userId } },
-            ]
-        } else {
-            filter.access = 'public'
-        }
-
-        const cluster = await db.collection(collectionName).findOne(filter)
+        console.log(cluster)
 
         if (!cluster) {
             return res.sendStatus(404)
@@ -59,7 +53,7 @@ async function getOneById(
         ;['nodes', 'connections', 'sources'].forEach((component) => {
             result[component] = db
                 .collection(component)
-                .find({ clusterId: cluster._id })
+                .find({ clusterId: cluster._id.toString() })
                 .toArray()
         })
 

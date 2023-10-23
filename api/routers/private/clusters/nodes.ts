@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { nodesControllers } from '../../../controllers/clusters/nodes'
 import { upload } from '../../../utils/multer'
-import { quotaNotReached } from '../../../middlewares/auth'
+import { quotaNotReached } from '../../../middlewares/users'
 
 export const nodesRouter = Router()
     .get('/', nodesControllers.get)

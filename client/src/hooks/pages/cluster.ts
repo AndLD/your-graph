@@ -4,9 +4,13 @@ import { ID } from '../../utils/types'
 import { INode } from '../../utils/interfaces/nodes'
 import { IConnection } from '../../utils/interfaces/connections'
 import { ISource } from '../../utils/interfaces/sources'
-import { ICluster } from '../../utils/interfaces/clusters'
+import {
+    ICluster,
+    IFetchClusterResponse,
+} from '../../utils/interfaces/clusters'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useFetchCluster } from '../store/clusters.api'
+import dayjs from 'dayjs'
 
 export default function useClusterContextValue() {
     const navigate = useNavigate()
@@ -41,12 +45,43 @@ export default function useClusterContextValue() {
         return navigate('/clusters')
     }
     // Fetch whole cluster with all nodes, connections and sources from the server
-    useFetchCluster(
-        clusterState[1],
-        nodesState[1],
-        edgesState[1],
-        sourcesState[1]
-    )
+
+    useFetchCluster((data: IFetchClusterResponse) => {
+        console.log(data)
+        clusterState[1](data.cluster)
+        nodesState[1](
+            data.nodes.map(({ _id, ...node }) => {
+                const modified: INode = {
+                    id: _id,
+                    ...node,
+                }
+
+                if (node.image) {
+                    modified.image = `/images/${_id}${node.image}`
+                }
+                if (node.startDate) {
+                    modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
+                }
+                if (node.endDate) {
+                    modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
+                }
+
+                return modified
+            })
+        )
+        edgesState[1](
+            data.connections.map(({ _id, ...rest }) => ({
+                id: _id,
+                ...rest,
+            }))
+        )
+        sourcesState[1](
+            data.sources.map(({ _id, ...rest }) => ({
+                id: _id,
+                ...rest,
+            }))
+        )
+    })
 
     useEffect(() => {
         localStorage.setItem('darkThemeEnabled', darkThemeEnabledState[0])

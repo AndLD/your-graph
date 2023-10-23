@@ -1,4 +1,7 @@
 import { ID } from '../types'
+import { IConnectionBackend } from './connections'
+import { INodeBackend } from './nodes'
+import { ISourceBackend } from './sources'
 
 export interface IClusterBackend {
     _id: ID
@@ -37,4 +40,11 @@ export interface IFetchClustersResponse {
 
 export interface IClusterDeleteResponse {
     result: { _id: ID }
+}
+
+export interface IFetchClusterResponse {
+    cluster: ICluster
+    nodes: INodeBackend[]
+    connections: IConnectionBackend[]
+    sources: ISourceBackend[]
 }

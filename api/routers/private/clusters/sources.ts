@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { sourcesControllers } from '../../../controllers/clusters/sources'
-import { quotaNotReached } from '../../../middlewares/auth'
+import { quotaNotReached } from '../../../middlewares/users'
 
 export const sourcesRouter = Router()
     .get('/', sourcesControllers.get)

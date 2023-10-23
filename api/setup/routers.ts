@@ -3,7 +3,7 @@ import { nodesRouter } from '../routers/private/clusters/nodes'
 import { connectionsRouter } from '../routers/private/clusters/connections'
 import { sourcesRouter } from '../routers/private/clusters/sources'
 import usersPublicRouter from '../routers/public/users'
-import { isAuthorized } from '../middlewares/auth'
+import { isAuthorized, userHasAccess } from '../middlewares/users'
 import authPublicRouter from '../routers/public/auth'
 import authPrivateRouter from '../routers/private/auth'
 import { clustersPrivateRouter } from '../routers/private/clusters'
@@ -21,7 +21,11 @@ export function setupRouters(app: Express) {
     apiRouter.use('/public', publicRouter)
 
     publicRouter.use('/auth', authPublicRouter)
-    publicRouter.use('/clusters', clustersPublicRouter)
+    publicRouter.use(
+        '/clusters',
+        userHasAccess('clusters', 'id', true, true),
+        clustersPublicRouter
+    )
     publicRouter.use('/users', setReqEntity(entities.USERS), usersPublicRouter)
 
     // Authorized router

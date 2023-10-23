@@ -95,36 +95,61 @@ export function hasAdminStatus(req: any, res: Response, next: NextFunction) {
 export function userHasAccess(
     collection: Collection,
     idField = 'id',
-    skipDeleted = true
+    skipDeleted = true,
+    access = false
 ) {
     return async (req: any, res: Response, next: NextFunction) => {
         const id = req.params[idField]
         const status = req.user?.status
         const userId = req.user?._id
 
-        if (!id || !userId || !collection || !status) {
+        if (!id || !collection) {
             return res.sendStatus(500)
         }
 
-        if (!userId) {
-            return res.sendStatus(500)
+        const filter: any = { _id: new ObjectId(id) }
+
+        if (userId) {
+            if (status && ['admin', 'owner'].includes(status)) {
+                return next()
+            }
+
+            filter.$or = [{ userId }]
+            if (access) {
+                filter.$or.push(
+                    {
+                        access: 'public',
+                        userId: { $ne: userId },
+                    },
+                    {
+                        access: 'unlisted',
+                        userId: { $ne: userId },
+                    },
+                    {
+                        access: 'limited',
+                        allowedUsers: userId,
+                    }
+                )
+            }
+        } else {
+            filter.$or = [{ access: 'unlisted' }, { access: 'public' }]
         }
 
-        if (['admin', 'owner'].includes(status)) {
-            return next()
-        }
-
-        const filter: Filter<any> = { _id: new ObjectId(id), userId }
         if (skipDeleted) {
-            filter.$or = [
-                { deleted: { $exists: false } },
-                { deleted: { $ne: true } },
-            ]
+            const staticFilter = {
+                $or: [{ deleted: { $exists: false } }, { deleted: false }],
+            }
+
+            filter.$or = filter.$or.map((item: any) => ({
+                ...item,
+                ...staticFilter,
+            }))
         }
 
         const item = await db.collection(collection).findOne(filter)
 
         if (item) {
+            req.middlewarePayload = { ...(req.middlewarePayload || {}), item }
             return next()
         }
 

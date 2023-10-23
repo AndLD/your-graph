@@ -6,7 +6,11 @@ import {
     usePostClusterMutation,
     usePutClusterMutation,
 } from '../../store/clusters.api'
-import { ICluster, IClusterPutBody } from '../../utils/interfaces/clusters'
+import {
+    ICluster,
+    IClusterPutBody,
+    IFetchClusterResponse,
+} from '../../utils/interfaces/clusters'
 import { errorNotification } from '../../utils/notifications'
 import { useToken } from '../auth'
 import { clustersContext } from '../../context'
@@ -33,10 +37,7 @@ export function useFetchClusters(
 }
 
 export function useFetchCluster(
-    setCluster: React.Dispatch<SetStateAction<ICluster | null>>,
-    setNodes: React.Dispatch<SetStateAction<INode[]>>,
-    setEdges: React.Dispatch<SetStateAction<IConnection[]>>,
-    setSources: React.Dispatch<SetStateAction<ISource[]>>
+    callback?: (data: IFetchClusterResponse) => void
 ) {
     const token = useToken()
 
@@ -47,40 +48,8 @@ export function useFetchCluster(
         : null
 
     useEffect(() => {
-        if (fetchClusterQuery && fetchClusterQuery.data) {
-            setCluster(fetchClusterQuery.data.cluster)
-            setNodes(
-                fetchClusterQuery.data.nodes.map(({ _id, ...node }) => {
-                    const modified: INode = {
-                        id: _id,
-                        ...node,
-                    }
-
-                    if (node.image) {
-                        modified.image = `/images/${_id}${node.image}`
-                    }
-                    if (node.startDate) {
-                        modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
-                    }
-                    if (node.endDate) {
-                        modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
-                    }
-
-                    return modified
-                })
-            )
-            setEdges(
-                fetchClusterQuery.data.connections.map(({ _id, ...rest }) => ({
-                    id: _id,
-                    ...rest,
-                }))
-            )
-            setSources(
-                fetchClusterQuery.data.sources.map(({ _id, ...rest }) => ({
-                    id: _id,
-                    ...rest,
-                }))
-            )
+        if (fetchClusterQuery && fetchClusterQuery.data && callback) {
+            callback(fetchClusterQuery.data)
         }
     }, [fetchClusterQuery?.data])
 }

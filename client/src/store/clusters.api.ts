@@ -4,11 +4,9 @@ import {
     IClusterPostBody,
     IClusterPutBody,
     ICluster,
+    IFetchClusterResponse,
 } from '../utils/interfaces/clusters'
 import { baseQueryWithRefresh } from '../utils/store'
-import { INodeBackend } from '../utils/interfaces/nodes'
-import { IConnectionBackend } from '../utils/interfaces/connections'
-import { ISourceBackend } from '../utils/interfaces/sources'
 
 export const clustersApi = createApi({
     reducerPath: 'clusters/api',
@@ -26,15 +24,7 @@ export const clustersApi = createApi({
                 url: '/api/private/clusters',
             }),
         }),
-        fetchCluster: builder.query<
-            {
-                cluster: ICluster
-                nodes: INodeBackend[]
-                connections: IConnectionBackend[]
-                sources: ISourceBackend[]
-            },
-            { id: string }
-        >({
+        fetchCluster: builder.query<IFetchClusterResponse, { id: string }>({
             query: ({ id }) => ({
                 url: `/api/private/clusters/${id}`,
             }),

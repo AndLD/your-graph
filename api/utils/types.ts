@@ -24,6 +24,9 @@ export interface AuthorizedRequest extends Request {
     user?: {
         _id: string
     }
+    middlewarePayload?: {
+        [key: string]: any
+    }
 }
 
 export type Any = { [key: string]: any }

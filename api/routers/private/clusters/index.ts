@@ -3,7 +3,7 @@ import { clustersControllers } from '../../../controllers/clusters'
 import { nodesRouter } from './nodes'
 import { connectionsRouter } from './connections'
 import { sourcesRouter } from './sources'
-import { quotaNotReached, userHasAccess } from '../../../middlewares/auth'
+import { quotaNotReached, userHasAccess } from '../../../middlewares/users'
 
 export const clustersPrivateRouter = Router()
     .get('/', clustersControllers.getByUserId)
