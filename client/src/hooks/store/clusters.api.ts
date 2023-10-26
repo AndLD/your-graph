@@ -15,10 +15,6 @@ import { errorNotification } from '../../utils/notifications'
 import { useToken } from '../auth'
 import { clustersContext } from '../../context'
 import { useParams } from 'react-router-dom'
-import { INode } from '../../utils/interfaces/nodes'
-import { IConnection } from '../../utils/interfaces/connections'
-import { ISource } from '../../utils/interfaces/sources'
-import dayjs from 'dayjs'
 
 export function useFetchClusters(
     setClusters: React.Dispatch<SetStateAction<ICluster[]>>
@@ -72,7 +68,7 @@ export function usePostCluster(callback: (newClusterId: string) => void) {
                 callback(cluster.id)
             } else {
                 const error = value.error?.msg || value.error?.data?.error
-                errorNotification(error, 'Додати роль не вдалося')
+                errorNotification(error, 'Post cluster request failed')
             }
         })
     }
@@ -97,7 +93,7 @@ export function useDeleteCluster() {
                 setClusters(newClusters)
             } else {
                 const error = value.error?.msg || value.error?.data?.error
-                errorNotification(error, 'Видалити роль не вдалося')
+                errorNotification(error, 'Delete cluster request failed')
             }
         })
     }
@@ -128,7 +124,7 @@ export function usePutCluster(callback: () => void) {
                 callback()
             } else {
                 const error = value.error?.msg || value.error?.data?.error
-                errorNotification(error, 'Оновлення ролі не вдалося')
+                errorNotification(error, 'Put cluster request failed')
             }
         })
     }

@@ -12,3 +12,7 @@ export interface IConnectionBackend {
     to: ID
     clusterId: ID
 }
+export interface IConnectionPostBody {
+    from: ID
+    to: ID
+}

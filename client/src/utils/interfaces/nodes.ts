@@ -34,6 +34,12 @@ export interface INodePut {
     sourceIds?: string[]
 }
 
+export interface INodePositionPutBody {
+    id: ID
+    x: number
+    y: number
+}
+
 export interface INode {
     id: ID
     label?: string

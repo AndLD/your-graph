@@ -1,6 +1,7 @@
 import ClustersMenu from '../components/ClustersPage/ClustersMenu'
 import useClustersContextValue from '../hooks/pages/clusters'
 import { clustersContext } from '../context'
+import { Button } from 'antd'
 
 export default function Clusters() {
     return (
@@ -9,7 +10,10 @@ export default function Clusters() {
                 <div className="auth-card">
                     <h1>Clusters Menu</h1>
                     <ClustersMenu />
-                    <p
+                    <div>
+                        <Button type="primary">Primary Button</Button>
+                    </div>
+                    {/* <p
                         style={{
                             marginTop: '15px',
                             cursor: 'pointer',
@@ -19,7 +23,7 @@ export default function Clusters() {
                         // onClick={() => ()}
                     >
                         Manage Subscription
-                    </p>
+                    </p> */}
                 </div>
             </div>
         </clustersContext.Provider>

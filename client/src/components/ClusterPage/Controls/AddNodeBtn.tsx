@@ -2,20 +2,24 @@ import { Button, Tooltip } from 'antd'
 import { useContext, useState, useEffect } from 'react'
 import { clusterContext } from '../../../context'
 import { useMessages } from '../../../utils/messages'
-import axios from 'axios'
 import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
-import { INode } from '../../../utils/interfaces/nodes'
+import { usePostNode } from '../../../hooks/store/nodes.api'
 
 export default function AddNodeBtn() {
     const {
-        clusterId,
         nodesState: [nodes, setNodes],
-        edgesState: [edges, setEdges],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
         selectNode,
     } = useContext(clusterContext)
 
     const [action, setAction] = useState<((param?: any) => any) | null>(null)
+
+    const postNode = usePostNode((id) => {
+        successMessage()
+        setAction(() => {
+            selectNode(id)
+        })
+    })
 
     useEffect(() => {
         if (action) {
@@ -25,50 +29,6 @@ export default function AddNodeBtn() {
     }, [nodes])
 
     const { successMessage, errorMessage, contextHolder } = useMessages()
-
-    function addNode(type?: 'child' | 'parent') {
-        const body: any = {}
-        const params: any = {}
-
-        if (selectedNodeId) {
-            const { x, y } = nodes.find(
-                (node) => node.id === selectedNodeId
-            ) as INode
-            if (x) {
-                body.x = x
-            }
-            if (y) {
-                body.y = y
-            }
-            params.selectedNodeId = selectedNodeId
-            params.type = type
-        }
-
-        // Make a POST request to add an empty node
-        axios
-            .post(`/api/private/clusters/${clusterId}/nodes`, body, { params })
-            .then((response) => {
-                successMessage()
-                const { _id: nodeId, ...rest } = response.data.node
-
-                // Update the nodesState by adding the new node
-                setNodes([...nodes, { id: nodeId, ...rest }])
-
-                if (selectedNodeId) {
-                    const { _id: connectionId, ...rest } =
-                        response.data.connection
-
-                    setEdges([...edges, { id: connectionId, ...rest }])
-                    setAction(() => {
-                        selectNode(nodeId)
-                    })
-                }
-            })
-            .catch((error) => {
-                errorMessage('Failed to add node:' + error)
-                console.error('Failed to add node:', error)
-            })
-    }
 
     return (
         <div style={{ margin: 10 }}>
@@ -85,7 +45,7 @@ export default function AddNodeBtn() {
                         <Button
                             style={{ width: 40 }}
                             type="primary"
-                            onClick={() => addNode('parent')}
+                            onClick={() => postNode('parent')}
                             icon={<LoginOutlined />}
                         />
                     </Tooltip>
@@ -93,13 +53,13 @@ export default function AddNodeBtn() {
                         <Button
                             style={{ width: 40 }}
                             type="primary"
-                            onClick={() => addNode('child')}
+                            onClick={() => postNode('child')}
                             icon={<LogoutOutlined />}
                         />
                     </Tooltip>
                 </div>
             ) : (
-                <Button type="primary" onClick={() => addNode()}>
+                <Button type="primary" onClick={() => postNode()}>
                     Add node
                 </Button>
             )}

@@ -3,19 +3,17 @@ import { DatePicker, Form, Input, Button, ColorPicker, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { useForm } from 'antd/es/form/Form'
 import EditableTags from './EditableTags'
-import axios from 'axios'
 import { clusterContext } from '../../context'
 import { useMessages } from '../../utils/messages'
 import dayjs from 'dayjs'
 import SourcesSelect from './SourcesSelect/SourcesSelect'
-import { INode, INodeBackend } from '../../utils/interfaces/nodes'
-import { API_URL } from '../../utils/constants'
+import { INode, INodePut } from '../../utils/interfaces/nodes'
+import { useDeleteNode, usePutNode } from '../../hooks/store/nodes.api'
 
 const { Dragger } = Upload
 
 export default function UpdateNodeForm() {
     const {
-        clusterId,
         nodesState: [nodes, setNodes],
         edgesState: [edges, setEdges],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
@@ -24,11 +22,53 @@ export default function UpdateNodeForm() {
     const updateBtnRef = useRef<HTMLElement>(null)
 
     const [isLoading, setIsLoading] = useState(false)
-    const { successMessage, errorMessage, contextHolder } = useMessages()
+    const { successMessage, contextHolder } = useMessages()
 
     const [form] = useForm()
     const [tags, setTags] = useState<string[]>(form.getFieldValue('tags'))
     const [fileList, setFileList] = useState<any[]>([])
+
+    const putNode = usePutNode((updatedNode) => {
+        successMessage()
+
+        setNodes(
+            nodes.map((node) => {
+                if (node.id === selectedNodeId) {
+                    const { _id, ...rest } = updatedNode
+                    const newNode: INode = {
+                        id: selectedNodeId,
+                        ...rest,
+                    }
+
+                    if (updatedNode.image) {
+                        newNode.image = `/images/${selectedNodeId}${updatedNode.image}`
+                    }
+
+                    return newNode as INode
+                }
+
+                return node
+            })
+        )
+    })
+
+    const deleteNode = useDeleteNode(() => {
+        // Handle successful deletion
+        successMessage()
+
+        // Remove the deleted node from nodes state
+        setNodes(nodes.filter(({ id }) => id !== selectedNodeId))
+
+        // Remove any edges connected to the deleted node
+        setEdges(
+            edges.filter(
+                (edge) =>
+                    edge.from !== selectedNodeId || edge.to !== selectedNodeId
+            )
+        )
+
+        setSelectedNodeId(null)
+    })
 
     // TODO: Handle situation, when user just move cursor to new line in description field. In this case it should not submit the form.
     const onEnterKeyDown = (event: KeyboardEvent) => {
@@ -152,81 +192,11 @@ export default function UpdateNodeForm() {
                 formData.append('image', fileList[0].originFileObj)
             }
 
-            try {
-                const response = await axios.put(
-                    `${API_URL}/api/private/clusters/${clusterId}/nodes/${selectedNodeId}`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    }
-                )
-
-                const updatedNode = response.data as INodeBackend
-
-                successMessage()
-
-                setNodes(
-                    nodes.map((node) => {
-                        if (node.id === selectedNodeId) {
-                            const { _id, ...rest } = updatedNode
-                            const newNode: INode = {
-                                id: selectedNodeId,
-                                ...rest,
-                            }
-
-                            if (updatedNode.image) {
-                                newNode.image = `/images/${selectedNodeId}${updatedNode.image}`
-                            }
-
-                            return newNode as INode
-                        }
-
-                        return node
-                    })
-                )
-            } catch (error: any) {
-                errorMessage('Failed to upload data: ' + error.message)
-                console.error('Failed to upload data: ' + error.message)
-            }
+            putNode(formData as INodePut)
 
             setFileList([])
             setIsLoading(false)
         })
-    }
-
-    function deleteNode() {
-        if (!selectedNodeId) {
-            return // If id is not available, do nothing
-        }
-
-        axios
-            .delete(
-                `${API_URL}/api/private/clusters/${clusterId}/nodes/${selectedNodeId}`
-            )
-            .then((response) => {
-                // Handle successful deletion
-                successMessage()
-
-                // Remove the deleted node from nodes state
-                setNodes(nodes.filter(({ id }) => id !== selectedNodeId))
-
-                // Remove any edges connected to the deleted node
-                setEdges(
-                    edges.filter(
-                        (edge) =>
-                            edge.from !== selectedNodeId ||
-                            edge.to !== selectedNodeId
-                    )
-                )
-
-                setSelectedNodeId(null)
-            })
-            .catch((error) => {
-                errorMessage('Failed to delete node:' + error)
-                console.error('Failed to delete node:', error)
-            })
     }
 
     function handleKeyDown(event: KeyboardEvent) {

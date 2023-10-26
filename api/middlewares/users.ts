@@ -147,7 +147,6 @@ export function userHasAccess(
         }
 
         const item = await db.collection(collection).findOne(filter)
-
         if (item) {
             req.middlewarePayload = { ...(req.middlewarePayload || {}), item }
             return next()
@@ -166,8 +165,8 @@ export function quotaNotReached(quotaType: Quota, clusterIdField = 'id') {
 
         // Check if user has unlimited quota
         if (
-            (['owner', 'admin', 'unlimited'].includes(status),
-            req.user.subscription && req.user.subscription !== 'free')
+            ['owner', 'admin', 'unlimited'].includes(status) ||
+            (req.user.subscription && req.user.subscription !== 'free')
         ) {
             return next()
         }
@@ -192,7 +191,7 @@ export function quotaNotReached(quotaType: Quota, clusterIdField = 'id') {
             const count = await db
                 .collection(quotaType)
                 .countDocuments({ clusterId })
-
+            console.log(count)
             if (count < freeSubscriptionQuotas[quotaType]) {
                 return next()
             }

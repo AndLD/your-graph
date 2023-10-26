@@ -3,7 +3,7 @@ import { nodesControllers } from '../../../controllers/clusters/nodes'
 import { upload } from '../../../utils/multer'
 import { quotaNotReached } from '../../../middlewares/users'
 
-export const nodesRouter = Router()
+export const nodesRouter = Router({ mergeParams: true })
     .get('/', nodesControllers.get)
     .post(
         '/',

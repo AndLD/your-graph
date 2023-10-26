@@ -114,25 +114,25 @@ async function put(req: Request, res: Response, next: NextFunction) {
             throw new ErrorHandler(400, `Invalid id: ${id}`)
         }
 
-        const updates: INodePut = {}
+        const updates: INodePut = req.body
 
-        if (req.body.tags) {
+        if (updates.tags) {
             updates.tags = JSON.parse(req.body.tags)
         }
-        if (req.body.sourceIds) {
+        if (updates.sourceIds) {
             updates.sourceIds = JSON.parse(req.body.sourceIds)
         }
-        if (req.body.startDate === 'null') {
+        if (updates.startDate === 'null') {
             updates.startDate = null
         }
-        if (req.body.endDate === 'null') {
+        if (updates.endDate === 'null') {
             updates.endDate = null
         }
 
         // Update the node in the database
         const updateResult = await db
             .collection('nodes')
-            .updateOne({ _id: new ObjectId(id), clusterId }, { $set: req.body })
+            .updateOne({ _id: new ObjectId(id), clusterId }, { $set: updates })
 
         if (updateResult.matchedCount === 0) {
             throw new ErrorHandler(
@@ -164,9 +164,9 @@ async function putPositions(req: Request, res: Response, next: NextFunction) {
         }
 
         const bulkWriteOptions = req.body.map(
-            ({ _id, ...rest }: { _id: string; x: number; y: number }) => ({
+            ({ id, ...rest }: { id: string; x: number; y: number }) => ({
                 updateOne: {
-                    filter: { _id: new ObjectId(_id), clusterId },
+                    filter: { _id: new ObjectId(id), clusterId },
                     update: { $set: rest },
                 },
             })

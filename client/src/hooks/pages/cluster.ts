@@ -11,6 +11,10 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { useFetchCluster } from '../store/clusters.api'
 import dayjs from 'dayjs'
+import {
+    useDeleteConnection,
+    usePostConnection,
+} from '../store/connections.api'
 
 export default function useClusterContextValue() {
     const navigate = useNavigate()
@@ -20,10 +24,6 @@ export default function useClusterContextValue() {
     )
 
     const clusterId = useParams().id
-
-    if (clusterId) {
-        localStorage.setItem('lastOpenedCluster', clusterId)
-    }
 
     const clusterState = useState<ICluster | null>(null)
 
@@ -41,47 +41,52 @@ export default function useClusterContextValue() {
 
     const isUpdateNodeFormVisibleState = useState(false)
 
-    if (!clusterId) {
-        return navigate('/clusters')
-    }
-    // Fetch whole cluster with all nodes, connections and sources from the server
+    let postConnection: any = () => {}
+    let deleteConnection: any = () => {}
 
-    useFetchCluster((data: IFetchClusterResponse) => {
-        console.log(data)
-        clusterState[1](data.cluster)
-        nodesState[1](
-            data.nodes.map(({ _id, ...node }) => {
-                const modified: INode = {
+    if (clusterId) {
+        localStorage.setItem('lastOpenedCluster', clusterId)
+        postConnection = usePostConnection(clusterId, edgesState)
+        deleteConnection = useDeleteConnection(clusterId, edgesState)
+        // Fetch whole cluster with all nodes, connections and sources from the server
+        useFetchCluster((data: IFetchClusterResponse) => {
+            clusterState[1](data.cluster)
+            nodesState[1](
+                data.nodes.map(({ _id, ...node }) => {
+                    const modified: INode = {
+                        id: _id,
+                        ...node,
+                    }
+
+                    if (node.image) {
+                        modified.image = `/images/${_id}${node.image}`
+                    }
+                    if (node.startDate) {
+                        modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
+                    }
+                    if (node.endDate) {
+                        modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
+                    }
+
+                    return modified
+                })
+            )
+            edgesState[1](
+                data.connections.map(({ _id, ...rest }) => ({
                     id: _id,
-                    ...node,
-                }
-
-                if (node.image) {
-                    modified.image = `/images/${_id}${node.image}`
-                }
-                if (node.startDate) {
-                    modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
-                }
-                if (node.endDate) {
-                    modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
-                }
-
-                return modified
-            })
-        )
-        edgesState[1](
-            data.connections.map(({ _id, ...rest }) => ({
-                id: _id,
-                ...rest,
-            }))
-        )
-        sourcesState[1](
-            data.sources.map(({ _id, ...rest }) => ({
-                id: _id,
-                ...rest,
-            }))
-        )
-    })
+                    ...rest,
+                }))
+            )
+            sourcesState[1](
+                data.sources.map(({ _id, ...rest }) => ({
+                    id: _id,
+                    ...rest,
+                }))
+            )
+        })
+    } else {
+        navigate('/clusters')
+    }
 
     useEffect(() => {
         localStorage.setItem('darkThemeEnabled', darkThemeEnabledState[0])
@@ -126,33 +131,10 @@ export default function useClusterContextValue() {
 
             // If connection already exists delete it otherwise create
             if (connection) {
-                axios
-                    .delete(
-                        `/api/private/clusters/${clusterId}/connections/${connection.id}`
-                    )
-                    .then((response) => {
-                        // Upon successful deletion, remove from edges state
-                        setEdges(edges.filter(({ id }) => id !== connection.id))
-                    })
-                    .catch((error) => {
-                        console.error('Failed to delete connection:', error)
-                    })
+                deleteConnection(connection.id)
             } else {
                 const newConnection = { from: selectedNodeId, to }
-                axios
-                    .post(
-                        `/api/private/clusters/${clusterId}/connections`,
-                        newConnection
-                    )
-                    .then((response) => {
-                        const { _id, ...rest } = response.data
-
-                        // Upon successful creation, add to edges state
-                        setEdges([...edges, { id: _id, ...rest }])
-                    })
-                    .catch((error) => {
-                        console.error('Failed to create connection:', error)
-                    })
+                postConnection(newConnection)
             }
         }
     }

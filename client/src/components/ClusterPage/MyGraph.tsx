@@ -6,8 +6,8 @@ import {
     ISelectEvent,
     IStabilizedEvent,
 } from '../../utils/interfaces/_events'
-import axios from 'axios'
 import { Utils } from '../../utils/utils'
+import { usePutNodes } from '../../hooks/store/nodes.api'
 
 export default function MyGraph() {
     const {
@@ -26,6 +26,8 @@ export default function MyGraph() {
             setIsUpdateNodeFormVisible,
         ],
     } = useContext(clusterContext)
+
+    const putNodesPosition = usePutNodes()
 
     const options = {
         autoResize: true,
@@ -86,15 +88,12 @@ export default function MyGraph() {
                 const body = Object.keys(nodesObject)
                     .filter((id: string) => !id.includes('edgeId'))
                     .map((id: string) => ({
-                        _id: id,
+                        id,
                         x: nodesObject[id].x,
                         y: nodesObject[id].y,
                     }))
 
-                await axios.put(
-                    `/api/private/clusters/${clusterId}/nodes`,
-                    body
-                )
+                putNodesPosition(body)
             }
         },
         [nodes]

@@ -42,8 +42,6 @@ async function getOneById(
                 .collection(collectionName)
                 .findOne({ _id: new ObjectId(id) }))
 
-        console.log(cluster)
-
         if (!cluster) {
             return res.sendStatus(404)
         }
