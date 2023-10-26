@@ -8,6 +8,7 @@ import {
 } from '../../utils/interfaces/_events'
 import { Utils } from '../../utils/utils'
 import { usePutNodes } from '../../hooks/store/nodes.api'
+import { KEYBOARD } from '../../utils/constants'
 
 export default function MyGraph() {
     const {
@@ -110,7 +111,7 @@ export default function MyGraph() {
                 return
             }
 
-            if (selectedNodeId && event.changedPointers[0].ctrlKey) {
+            if (selectedNodeId && event.changedPointers[0][KEYBOARD.CTRL_KEY]) {
                 updateConnection(nodes[0])
             }
 
