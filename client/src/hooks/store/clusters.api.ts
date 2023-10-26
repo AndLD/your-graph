@@ -8,6 +8,7 @@ import {
 } from '../../store/clusters.api'
 import {
     ICluster,
+    IClusterPostBody,
     IClusterPutBody,
     IFetchClusterResponse,
 } from '../../utils/interfaces/clusters'
@@ -50,22 +51,20 @@ export function useFetchCluster(
     }, [fetchClusterQuery?.data])
 }
 
-export function usePostCluster(callback: (newClusterId: string) => void) {
+export function usePostCluster(callback?: (newClusterId: string) => void) {
     const [clusters, setClusters] = useContext(clustersContext).clustersState
 
     const [postClusterMutation] = usePostClusterMutation()
 
-    return (title: string) => {
+    return (body: IClusterPostBody) => {
         postClusterMutation({
-            body: {
-                title,
-            },
+            body,
         }).then((value: any) => {
             if (value.data) {
                 const cluster = value?.data
                 setClusters([...clusters, cluster])
 
-                callback(cluster.id)
+                callback && callback(cluster.id)
             } else {
                 const error = value.error?.msg || value.error?.data?.error
                 errorNotification(error, 'Post cluster request failed')

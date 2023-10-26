@@ -2,17 +2,34 @@ import ClustersMenu from '../components/ClustersPage/ClustersMenu'
 import useClustersContextValue from '../hooks/pages/clusters'
 import { clustersContext } from '../context'
 import { Button } from 'antd'
+import ClusterCreateModal from '../components/ClustersPage/ClusterCreateModal'
+import { useState } from 'react'
 
 export default function Clusters() {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+    const showModal = () => {
+        setIsModalOpen(true)
+    }
     return (
         <clustersContext.Provider value={useClustersContextValue()}>
             <div className="auth-page">
                 <div className="auth-card">
                     <h1>Clusters Menu</h1>
                     <ClustersMenu />
-                    <div>
-                        <Button type="primary">Primary Button</Button>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Button type="primary" onClick={showModal}>
+                            Add Cluster
+                        </Button>
                     </div>
+
+                    <ClusterCreateModal
+                        isModalOpenState={
+                            [isModalOpen, setIsModalOpen] as [
+                                boolean,
+                                React.Dispatch<React.SetStateAction<boolean>>
+                            ]
+                        }
+                    />
                     {/* <p
                         style={{
                             marginTop: '15px',

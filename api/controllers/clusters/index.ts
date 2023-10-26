@@ -82,6 +82,10 @@ async function post(req: AuthorizedRequest, res: Response, next: NextFunction) {
             userId,
         }
 
+        if (req.body.description) {
+            newCluster.description = req.body.description
+        }
+
         const result = await db.collection(collectionName).insertOne(newCluster)
         res.json({ _id: result.insertedId, ...newCluster })
     } catch (error) {

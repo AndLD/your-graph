@@ -10,6 +10,7 @@ export interface IClusterBackend {
 
 export interface IClusterPostBody {
     title: string
+    description?: string
     userId: string
     access?: 'public' | 'private'
 }

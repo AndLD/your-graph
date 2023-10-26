@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { ID } from '../../utils/types'
 import { INode } from '../../utils/interfaces/nodes'
 import { IConnection } from '../../utils/interfaces/connections'
