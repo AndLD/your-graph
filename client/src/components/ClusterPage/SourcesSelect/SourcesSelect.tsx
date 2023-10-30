@@ -67,21 +67,25 @@ export default function SourcesSelect({
 
     useEffect(() => {
         setOptions(
-            sources.map((source: ISource) => ({
-                value: source.id as ID,
-                label: (
-                    <Source
-                        id={source.id as ID}
-                        title={source.title}
-                        link={source.link}
-                        isSelectOpenState={[isOpen, setIsOpen]}
-                        setIsSourceControlsHover={setIsSourceControlsHover}
-                        selectedSources={value}
-                        setSourceEdit={setSourceEdit}
-                        form={form}
-                    />
-                ),
-            }))
+            sources.map((source: ISource) => {
+                console.log(source)
+                return {
+                    value: source.id as ID,
+                    label: (
+                        <Source
+                            key={source.id}
+                            id={source.id as ID}
+                            title={source.title}
+                            link={source.link}
+                            isSelectOpenState={[isOpen, setIsOpen]}
+                            setIsSourceControlsHover={setIsSourceControlsHover}
+                            selectedSources={value}
+                            setSourceEdit={setSourceEdit}
+                            form={form}
+                        />
+                    ),
+                }
+            })
         )
     }, [sources, isSourceControlsHover, isOpen, sourceEdit])
 

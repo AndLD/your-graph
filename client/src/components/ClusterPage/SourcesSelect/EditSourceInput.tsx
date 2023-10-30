@@ -1,7 +1,7 @@
 import { Divider, Input } from 'antd'
 import { CloseOutlined, EditOutlined } from '@ant-design/icons'
 import { useMessages } from '../../../utils/messages'
-import { usePutSource } from '../../../hooks/sources'
+import { usePutSource } from '../../../hooks/store/sources.api'
 import { LINE_SPLITTER } from '../../../utils/constants'
 
 interface IEditSourceInputProps {

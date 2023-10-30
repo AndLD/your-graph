@@ -9,7 +9,13 @@ interface ISourceProps {
     selectedSources: string[]
     isSelectOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
     setIsSourceControlsHover: React.Dispatch<React.SetStateAction<boolean>>
-    setSourceEdit: React.Dispatch<React.SetStateAction<{ id: string; newTitle: string; title: string } | null>>
+    setSourceEdit: React.Dispatch<
+        React.SetStateAction<{
+            id: string
+            newTitle: string
+            title: string
+        } | null>
+    >
     form: FormInstance<any>
 }
 
@@ -21,23 +27,30 @@ export default function Source({
     isSelectOpenState,
     setIsSourceControlsHover,
     setSourceEdit,
-    form
+    form,
 }: ISourceProps) {
     const [isHover, setIsHover] = useState(false)
 
     const [isSelectOpen, setIsSelectOpen] = isSelectOpenState
-
     const shortTitle = title.length > 25 ? title.slice(0, 25) + '...' : title
 
     return (
         <div
-            style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '100%' }}
+            style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                maxWidth: '100%',
+            }}
             onMouseEnter={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
         >
             <Tooltip title={title}>
                 {link ? (
-                    <a href={link} target="_blank" onClick={(e) => e.stopPropagation()}>
+                    <a
+                        href={link}
+                        target="_blank"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {shortTitle}
                     </a>
                 ) : (
