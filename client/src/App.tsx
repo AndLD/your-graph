@@ -1,13 +1,16 @@
 import { BrowserRouter } from 'react-router-dom'
 import AppRoutes from './components/AppRoutes'
-import { useAuth } from './hooks/auth'
+import { clustersContext } from './context'
+import useClustersContextValue from './hooks/pages/clusters'
 
 function App() {
     // useAuth()
 
     return (
         <BrowserRouter>
-            <AppRoutes />
+            <clustersContext.Provider value={useClustersContextValue()}>
+                <AppRoutes />
+            </clustersContext.Provider>
         </BrowserRouter>
     )
 }
