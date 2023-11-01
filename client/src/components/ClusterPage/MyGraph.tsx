@@ -1,5 +1,5 @@
 import Graph from 'react-graph-vis'
-import { useCallback, useContext, useEffect } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { clusterContext } from '../../context'
 import {
     IHoverEvent,
@@ -27,6 +27,8 @@ export default function MyGraph() {
             setIsUpdateNodeFormVisible,
         ],
     } = useContext(clusterContext)
+
+    let isSkipUpdatePosition = true
 
     const putNodesPosition = usePutNodes()
 
@@ -83,19 +85,22 @@ export default function MyGraph() {
 
     const onStabilized = useCallback(
         async function ({ iterations }: IStabilizedEvent) {
-            if (iterations > 100) {
-                const nodesObject = network.body.nodes
+            if (!isSkipUpdatePosition) {
+                if (iterations > 100) {
+                    const nodesObject = network.body.nodes
 
-                const body = Object.keys(nodesObject)
-                    .filter((id: string) => !id.includes('edgeId'))
-                    .map((id: string) => ({
-                        id,
-                        x: nodesObject[id].x,
-                        y: nodesObject[id].y,
-                    }))
-
-                putNodesPosition(body)
+                    const body = Object.keys(nodesObject)
+                        .filter((id: string) => !id.includes('edgeId'))
+                        .map((id: string) => ({
+                            id,
+                            x: nodesObject[id].x,
+                            y: nodesObject[id].y,
+                        }))
+                    console.log('131212412')
+                    putNodesPosition(body)
+                }
             }
+            isSkipUpdatePosition = false
         },
         [nodes]
     )
