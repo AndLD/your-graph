@@ -7,26 +7,14 @@ import { usePostNode } from '../../../hooks/store/nodes.api'
 
 export default function AddNodeBtn() {
     const {
-        nodesState: [nodes, setNodes],
         selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
         selectNode,
+        relationNewNodeState: [relationNewNode, setRelationNewNode],
+        isSelectCategoryModalVisibleState: [
+            isSelectCategoryModalVisible,
+            setIsSelectCategoryModalVisible,
+        ],
     } = useContext(clusterContext)
-
-    const [action, setAction] = useState<((param?: any) => any) | null>(null)
-
-    const postNode = usePostNode((id) => {
-        successMessage()
-        setAction(() => {
-            selectNode(id)
-        })
-    })
-
-    useEffect(() => {
-        if (action) {
-            action()
-            setAction(null)
-        }
-    }, [nodes])
 
     const { successMessage, errorMessage, contextHolder } = useMessages()
 
@@ -45,7 +33,10 @@ export default function AddNodeBtn() {
                         <Button
                             style={{ width: 40 }}
                             type="primary"
-                            onClick={() => postNode('parent')}
+                            onClick={() => {
+                                setRelationNewNode('parent')
+                                setIsSelectCategoryModalVisible(true)
+                            }}
                             icon={<LoginOutlined />}
                         />
                     </Tooltip>
@@ -53,13 +44,22 @@ export default function AddNodeBtn() {
                         <Button
                             style={{ width: 40 }}
                             type="primary"
-                            onClick={() => postNode('child')}
+                            onClick={() => {
+                                setRelationNewNode('child')
+                                setIsSelectCategoryModalVisible(true)
+                            }}
                             icon={<LogoutOutlined />}
                         />
                     </Tooltip>
                 </div>
             ) : (
-                <Button type="primary" onClick={() => postNode()}>
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        setRelationNewNode(undefined)
+                        setIsSelectCategoryModalVisible(true)
+                    }}
+                >
                     Add node
                 </Button>
             )}

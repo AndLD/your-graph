@@ -39,6 +39,20 @@ export default function useClusterContextValue() {
     const sourcesState = useState<ISource[]>([])
 
     const isUpdateNodeFormVisibleState = useState(false)
+    const isSelectCategoryModalVisibleState = useState(false)
+    const isCreateCategoryModalVisibleState = useState(false)
+
+    const selectedCategoryState = useState<{ title: string } | null>({
+        title: 'default',
+    })
+
+    const relationNewNodeState = useState<undefined | 'child' | 'parent'>()
+
+    const categoriesState = useState([
+        { title: 'default' },
+        { title: 'new cat' },
+        { title: 'eafaefa' },
+    ])
 
     let postConnection: any = () => {}
     let deleteConnection: any = () => {}
@@ -152,5 +166,10 @@ export default function useClusterContextValue() {
         updateConnection,
         deselectNodes,
         isUpdateNodeFormVisibleState,
+        isSelectCategoryModalVisibleState,
+        isCreateCategoryModalVisibleState,
+        relationNewNodeState,
+        categoriesState,
+        selectedCategoryState,
     }
 }
