@@ -21,13 +21,13 @@ async function get(req: Request, res: Response, next: NextFunction) {
 }
 
 async function post(req: Request, res: Response, next: NextFunction) {
-    const { from, to } = req.body
-    if (!from || !to) {
+    const { from, to, clusterId } = req.body
+    if (!from || !to || !clusterId) {
         return next(new Error('Missing parameters'))
     }
 
     try {
-        const newConnection = { from, to }
+        const newConnection = { from, to, clusterId }
         const result = await db
             .collection(collectionName)
             .insertOne(newConnection)

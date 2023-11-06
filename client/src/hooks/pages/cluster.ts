@@ -146,7 +146,7 @@ export default function useClusterContextValue() {
             if (connection) {
                 deleteConnection(connection.id)
             } else {
-                const newConnection = { from: selectedNodeId, to }
+                const newConnection = { from: selectedNodeId, to, clusterId }
                 postConnection(newConnection)
             }
         }

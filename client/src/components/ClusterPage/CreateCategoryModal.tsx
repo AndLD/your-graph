@@ -3,9 +3,6 @@ import { Form, Button, Input } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { clusterContext } from '../../context'
 import Title from 'antd/es/typography/Title'
-import { useMessages } from '../../utils/messages'
-import { usePostNode } from '../../hooks/store/nodes.api'
-import { PlusOutlined } from '@ant-design/icons'
 
 export default function CreateCategoryModal() {
     const [form] = useForm()
