@@ -16,7 +16,6 @@ export default function AddSourceBtn({
     const { errorMessage, contextHolder } = useMessages()
 
     const postSource = usePostSource((newSourceId: string) => {
-        console.log('SourceId: ', form.getFieldValue('sourceId'))
         setNewSourceTitle('')
         form.setFieldValue('sourceIds', [
             ...form.getFieldValue('sourceIds'),

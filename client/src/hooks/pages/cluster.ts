@@ -42,6 +42,10 @@ export default function useClusterContextValue() {
     const isSelectCategoryModalVisibleState = useState(false)
     const isCreateCategoryModalVisibleState = useState(false)
 
+    const fieldsForCategoryState = useState<
+        { id: number; label: string; type: string }[]
+    >([])
+
     const selectedCategoryState = useState<{ title: string } | null>({
         title: 'default',
     })
@@ -171,5 +175,6 @@ export default function useClusterContextValue() {
         relationNewNodeState,
         categoriesState,
         selectedCategoryState,
+        fieldsForCategoryState,
     }
 }

@@ -96,7 +96,6 @@ export default function MyGraph() {
                             x: nodesObject[id].x,
                             y: nodesObject[id].y,
                         }))
-                    console.log('131212412')
                     putNodesPosition(body)
                 }
             }

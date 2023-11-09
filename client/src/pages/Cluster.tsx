@@ -7,7 +7,7 @@ import SelectCategoryModalWrapper from '../components/ClusterPage/SelectCategory
 import ImageContainer from '../components/ClusterPage/ImageContainer'
 import TitleContainer from '../components/ClusterPage/TitleContainer'
 import SearchContainer from '../components/ClusterPage/SearchContainer'
-import CreateCategoryModalWrapper from '../components/ClusterPage/CreateCategoryModalWrapper'
+import CreateCategoryModalWrapper from '../components/ClusterPage/Category/CreateCategoryModalWrapper'
 
 export default function Cluster() {
     return (

@@ -20,8 +20,6 @@ export default function ClusterCreateModal({ isModalOpenState }: IProps) {
                 }
             })
 
-            console.log(body)
-
             postCluster(body)
             form.resetFields()
         })

@@ -14,7 +14,7 @@ async function deleteOldClustersFromTrashbox() {
     })
 
     logger.info(
-        `Cron: Deleted clusters placed in tashbox more than 30 days ago: ${result.deletedCount}`
+        `Cron: Deleted clusters placed in trashbox more than 30 days ago: ${result.deletedCount}`
     )
 }
 

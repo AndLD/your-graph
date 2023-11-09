@@ -32,7 +32,6 @@ export function usePostSource(callback: (newSourceId: string) => void) {
         }).then((response: any) => {
             const source = response.data
             setSources([...sources, source])
-            console.log('new source: ', source)
 
             callback(source.id)
         })

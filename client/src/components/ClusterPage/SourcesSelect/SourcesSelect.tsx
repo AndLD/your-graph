@@ -68,7 +68,6 @@ export default function SourcesSelect({
     useEffect(() => {
         setOptions(
             sources.map((source: ISource) => {
-                console.log(source)
                 return {
                     value: source.id as ID,
                     label: (

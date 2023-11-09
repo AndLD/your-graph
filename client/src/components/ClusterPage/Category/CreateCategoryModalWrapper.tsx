@@ -1,5 +1,5 @@
-import { clusterContext } from '../../context'
-import SelectCategoryModal from './SelectCategoryModal'
+import { clusterContext } from '../../../context'
+import SelectCategoryModal from '../SelectCategoryModal'
 import { useContext } from 'react'
 import CreateCategoryModal from './CreateCategoryModal'
 

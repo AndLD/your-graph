@@ -42,18 +42,9 @@ export default function SelectCategoryModal() {
         }
     }, [nodes])
 
-    useEffect(() => {
-        console.log(categories)
-    }, [])
-
-    useEffect(() => {
-        console.log('selected category: ', selectedCategory)
-    }, [selectCategory])
-
     const { successMessage, errorMessage, contextHolder } = useMessages()
 
     function createNode() {
-        console.log(selectedCategory)
         postNode(relationNewNode)
         setIsSelectCategoryModalVisible(false)
         setRelationNewNode(undefined)
@@ -68,7 +59,6 @@ export default function SelectCategoryModal() {
     }
 
     function selectCategory(item: any) {
-        console.log('1 selected category: ', item)
         setSelectedCategory({ ...item })
     }
 
