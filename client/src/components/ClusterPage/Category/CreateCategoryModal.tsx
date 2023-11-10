@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useRef } from 'react'
-import { Form, Button, Input, Checkbox, Typography } from 'antd'
+import { Form, Button, Input, Checkbox, Typography, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { clusterContext } from '../../../context'
 import Title from 'antd/es/typography/Title'
@@ -44,9 +44,7 @@ export default function CreateCategoryModal() {
         { label: 'Color field', value: 'color' },
         { label: 'Image field', value: 'image' },
         { label: 'Source filed', value: 'source' },
-        { label: 'any', value: 'any1' },
-        { label: 'any', value: 'any2' },
-        { label: 'any', value: 'any3' },
+        { label: 'Tags', value: 'tags' },
     ]
 
     function onChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -85,8 +83,24 @@ export default function CreateCategoryModal() {
         ])
     }
 
+    const handleOk = () => {
+        createCategory()
+        setIsCreateCategoryModalVisible(false)
+    }
+
+    const handleCancel = () => {
+        setIsCreateCategoryModalVisible(false)
+    }
+
     return (
-        <div className="form-container">
+        <Modal
+            open={isCreateCategoryModalVisible}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            okText="Create"
+            width={'400px'}
+            centered
+        >
             <div
                 style={{
                     display: 'flex',
@@ -163,29 +177,6 @@ export default function CreateCategoryModal() {
                     onChange={handleChangeCheckboxes}
                 />
             </div>
-
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'end',
-                }}
-            >
-                <div style={{ textAlign: 'right' }}>
-                    <Button
-                        type="primary"
-                        style={{ marginRight: 10 }}
-                        onClick={createCategory}
-                    >
-                        Create
-                    </Button>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                    <Button style={{ marginRight: 10 }} onClick={onCancel}>
-                        Cancel
-                    </Button>
-                </div>
-            </div>
-        </div>
+        </Modal>
     )
 }

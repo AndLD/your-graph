@@ -23,7 +23,6 @@ export default function SelectCategoryModal() {
             setIsCreateCategoryModalVisible,
         ],
         categoriesState: [categories, setCategories],
-        selectedCategoryState: [selectedCategory, setSelectedCategory],
     } = useContext(clusterContext)
 
     const [action, setAction] = useState<((param?: any) => any) | null>(null)
@@ -58,19 +57,15 @@ export default function SelectCategoryModal() {
         setIsCreateCategoryModalVisible(true)
     }
 
-    function selectCategory(item: any) {
-        setSelectedCategory({ ...item })
-    }
-
     return (
-        <div className="form-container">
+        <div className="form-container" style={{ top: 10, right: 10 }}>
             <div
                 style={{
                     display: 'flex',
                     justifyContent: 'center',
                 }}
             >
-                <Title level={3}>Select category</Title>
+                <Title level={3}>Choose category</Title>
             </div>
 
             <div style={{ height: '400px' }}>
@@ -89,21 +84,16 @@ export default function SelectCategoryModal() {
                                 style={{ width: '70px', textAlign: 'center' }}
                                 key={index}
                             >
-                                {item.title}
                                 <div
                                     style={{
-                                        backgroundColor: `${
-                                            item.title ===
-                                            selectedCategory?.title
-                                                ? 'black'
-                                                : '#eeeeee'
-                                        }`,
+                                        backgroundColor: '#eeeeee',
                                         width: '70px',
                                         height: '70px',
                                         borderRadius: '50%',
                                     }}
-                                    onClick={() => selectCategory(item)}
+                                    onClick={() => createNode()}
                                 />
+                                {item.title}
                             </div>
                         ))}
                     <div
@@ -111,7 +101,7 @@ export default function SelectCategoryModal() {
                             width: '70px',
                             height: '88px',
                             display: 'flex',
-                            alignItems: 'end',
+                            alignItems: 'start',
                         }}
                     >
                         <Button
@@ -131,15 +121,6 @@ export default function SelectCategoryModal() {
                     justifyContent: 'end',
                 }}
             >
-                <div style={{ textAlign: 'right' }}>
-                    <Button
-                        type="primary"
-                        style={{ marginRight: 10 }}
-                        onClick={createNode}
-                    >
-                        Create
-                    </Button>
-                </div>
                 <div style={{ textAlign: 'right' }}>
                     <Button style={{ marginRight: 10 }} onClick={onCancel}>
                         Cancel
