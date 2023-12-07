@@ -1,26 +1,21 @@
-import { useState, useEffect, useContext, useRef } from 'react'
-import { Form, Button, Input, Checkbox, Typography, Modal } from 'antd'
-import { useForm } from 'antd/es/form/Form'
+import { useState, useEffect, useContext } from 'react'
+import { Button, Input, Checkbox, Modal } from 'antd'
 import { clusterContext } from '../../../context'
 import Title from 'antd/es/typography/Title'
 import { CheckboxOptionType } from 'antd/lib'
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import CreateNewField from './CreateNewField'
-
+import { usePostCategory } from '../../../hooks/store/caregories.api'
 export default function CreateCategoryModal() {
-    const [form] = useForm()
-
     const {
-        nodesState: [nodes, setNodes],
-        selectNode,
-        relationNewNodeState: [relationNewNode, setRelationNewNode],
         isCreateCategoryModalVisibleState: [
             isCreateCategoryModalVisible,
             setIsCreateCategoryModalVisible,
         ],
         categoriesState: [categories, setCategories],
         fieldsForCategoryState: [fieldsForCategory, setFieldsForCategory],
+        clusterId,
     } = useContext(clusterContext)
 
     const [titleInput, setTitleInput] = useState('')
@@ -31,6 +26,8 @@ export default function CreateCategoryModal() {
     const [checkboxesValues, setCheckboxesValues] = useState<
         CheckboxValueType[]
     >([])
+
+    const postCategory = usePostCategory()
 
     useEffect(() => {
         if (fieldsForCategory.length >= 5) {
@@ -52,18 +49,15 @@ export default function CreateCategoryModal() {
     }
 
     function createCategory() {
-        const category = {
-            title: titleInput,
-            onlyForThisCluster: isOnlyForThisCluster,
-            options: checkboxesValues,
-            fields: fieldsForCategory,
+        if (clusterId) {
+            const category = {
+                title: titleInput,
+                clusterId: isOnlyForThisCluster ? clusterId : null,
+                options: checkboxesValues,
+                fields: fieldsForCategory,
+            }
+            postCategory(category)
         }
-        setCategories([...categories, category])
-        console.log('new category: ', category)
-        setIsCreateCategoryModalVisible(false)
-    }
-
-    function onCancel() {
         setIsCreateCategoryModalVisible(false)
     }
 
@@ -76,11 +70,7 @@ export default function CreateCategoryModal() {
     }
 
     function handleCreateNewField() {
-        const id = Math.floor(Math.random() * 10000) + 1
-        setFieldsForCategory((prev) => [
-            ...prev,
-            { id: id, label: '', type: '' },
-        ])
+        setFieldsForCategory((prev) => [...prev, { label: '', type: '' }])
     }
 
     const handleOk = () => {
@@ -100,6 +90,7 @@ export default function CreateCategoryModal() {
             okText="Create"
             width={'400px'}
             centered
+            zIndex={10}
         >
             <div
                 style={{
@@ -136,8 +127,8 @@ export default function CreateCategoryModal() {
             >
                 <h4 style={{ marginBottom: '5px' }}>Fields</h4>
                 <div>
-                    {fieldsForCategory.map((item, index) => (
-                        <CreateNewField key={index} fieldId={item.id} />
+                    {fieldsForCategory.map((_, index) => (
+                        <CreateNewField key={index} index={index} />
                     ))}
                 </div>
                 {isCreateFieldBtnVisible && (

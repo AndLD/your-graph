@@ -42,9 +42,9 @@ export default function useClusterContextValue() {
     const isSelectCategoryModalVisibleState = useState(false)
     const isCreateCategoryModalVisibleState = useState(false)
 
-    const fieldsForCategoryState = useState<
-        { id: number; label: string; type: string }[]
-    >([])
+    const fieldsForCategoryState = useState<{ label: string; type: string }[]>(
+        []
+    )
 
     const selectedCategoryState = useState<{ title: string } | null>({
         title: 'default',
@@ -52,11 +52,7 @@ export default function useClusterContextValue() {
 
     const relationNewNodeState = useState<undefined | 'child' | 'parent'>()
 
-    const categoriesState = useState([
-        { title: 'default' },
-        { title: 'new cat' },
-        { title: 'eafaefa' },
-    ])
+    const categoriesState = useState([{ title: 'default' }])
 
     let postConnection: any = () => {}
     let deleteConnection: any = () => {}
@@ -75,14 +71,20 @@ export default function useClusterContextValue() {
                         ...node,
                     }
 
-                    if (node.image) {
-                        modified.image = `/images/${_id}${node.image}`
+                    if (node.payload.image) {
+                        modified.payload.image = `/images/${_id}${node.payload.image}`
                     }
-                    if (node.startDate) {
-                        modified.startDate = dayjs(node.startDate, 'DD.MM.YYYY')
+                    if (node.payload.startDate) {
+                        modified.payload.startDate = dayjs(
+                            node.payload.startDate,
+                            'DD.MM.YYYY'
+                        )
                     }
-                    if (node.endDate) {
-                        modified.endDate = dayjs(node.endDate, 'DD.MM.YYYY')
+                    if (node.payload.endDate) {
+                        modified.payload.endDate = dayjs(
+                            node.payload.endDate,
+                            'DD.MM.YYYY'
+                        )
                     }
 
                     return modified
@@ -96,6 +98,12 @@ export default function useClusterContextValue() {
             )
             sourcesState[1](
                 data.sources.map(({ _id, ...rest }) => ({
+                    id: _id,
+                    ...rest,
+                }))
+            )
+            categoriesState[1](
+                data.categories.map(({ _id, ...rest }) => ({
                     id: _id,
                     ...rest,
                 }))
@@ -136,7 +144,7 @@ export default function useClusterContextValue() {
         }
 
         const [selectedNodeId] = selectedNodeIdState
-        const [edges, setEdges] = edgesState
+        const [edges] = edgesState
 
         // Selected node exists and it was not selected twice
         if (selectedNodeId && selectedNodeId !== to) {

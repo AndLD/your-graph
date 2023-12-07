@@ -1,4 +1,5 @@
 import { ID } from '../types'
+import { ICategory, ICategoryBackend } from './categories'
 import { IConnectionBackend } from './connections'
 import { INodeBackend } from './nodes'
 import { ISourceBackend } from './sources'
@@ -47,4 +48,5 @@ export interface IFetchClusterResponse {
     nodes: INodeBackend[]
     connections: IConnectionBackend[]
     sources: ISourceBackend[]
+    categories: ICategoryBackend[]
 }

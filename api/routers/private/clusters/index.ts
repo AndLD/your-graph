@@ -4,6 +4,7 @@ import { nodesRouter } from './nodes'
 import { connectionsRouter } from './connections'
 import { sourcesRouter } from './sources'
 import { quotaNotReached, userHasAccess } from '../../../middlewares/users'
+import { categoriesRouter } from './categories'
 
 export const clustersPrivateRouter = Router()
     .get('/', clustersControllers.getByUserId)
@@ -26,4 +27,9 @@ export const clustersPrivateRouter = Router()
         '/:clusterId/sources',
         userHasAccess('clusters', 'clusterId'),
         sourcesRouter
+    )
+    .use(
+        '/:clusterId/categories',
+        userHasAccess('clusters', 'clusterId'),
+        categoriesRouter
     )

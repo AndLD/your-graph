@@ -1,16 +1,20 @@
 import { Dayjs } from 'dayjs'
 import { ID } from '../types'
 
-export interface INodeBackend {
-    _id: ID
+type INodePayload = {
     title?: string
     description?: string
-    startDate?: string | null
-    endDate?: string | null
+    startDate?: Dayjs | string | null
+    endDate?: Dayjs | string | null
     tags?: string[]
-    sourceIds?: string[]
     image?: string
-    color?: string
+    color?: string | { border: string; background: string }
+} & { [key: string]: Dayjs | string | null }
+
+export interface INodeBackend {
+    _id: ID
+    payload: INodePayload
+    sourceIds?: string[]
     clusterId: ID
 }
 
@@ -43,13 +47,7 @@ export interface INodePositionPutBody {
 export interface INode {
     id: ID
     label?: string
-    title?: string
-    description?: string
-    startDate?: Dayjs | string | null
-    endDate?: Dayjs | string | null
-    tags?: string[]
-    image?: string
-    color?: string | { border: string; background: string }
+    payload: INodePayload
     clusterId: ID
 
     group?: string

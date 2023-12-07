@@ -1,5 +1,5 @@
 import { Button, Input, Select } from 'antd'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { clusterContext } from '../../../context'
 
 const options = [
@@ -7,19 +7,17 @@ const options = [
     { value: 'Date', label: 'Date' },
 ]
 
-export default function CreateNewField({ fieldId }: { fieldId: number }) {
+export default function CreateNewField({ index }: { index: number }) {
     const {
         fieldsForCategoryState: [fieldsForCategory, setFieldsForCategory],
     } = useContext(clusterContext)
 
     const findFieldIndex = () => {
-        return fieldsForCategory.findIndex((field) => field.id === fieldId)
+        return fieldsForCategory.findIndex((_, i) => i === index)
     }
 
     function handleDeleteField() {
-        const newFields = fieldsForCategory.filter(
-            (field) => field.id !== fieldId
-        )
+        const newFields = fieldsForCategory.filter((_, i) => i !== index)
         setFieldsForCategory(newFields)
     }
 

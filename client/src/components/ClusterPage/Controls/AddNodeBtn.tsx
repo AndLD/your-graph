@@ -1,22 +1,17 @@
 import { Button, Tooltip } from 'antd'
-import { useContext, useState, useEffect } from 'react'
+import { useContext } from 'react'
 import { clusterContext } from '../../../context'
 import { useMessages } from '../../../utils/messages'
 import { LoginOutlined, LogoutOutlined } from '@ant-design/icons'
-import { usePostNode } from '../../../hooks/store/nodes.api'
 
 export default function AddNodeBtn() {
     const {
-        selectedNodeIdState: [selectedNodeId, setSelectedNodeId],
-        selectNode,
-        relationNewNodeState: [relationNewNode, setRelationNewNode],
-        isSelectCategoryModalVisibleState: [
-            isSelectCategoryModalVisible,
-            setIsSelectCategoryModalVisible,
-        ],
+        selectedNodeIdState: [selectedNodeId],
+        relationNewNodeState: [, setRelationNewNode],
+        isSelectCategoryModalVisibleState: [, setIsSelectCategoryModalVisible],
     } = useContext(clusterContext)
 
-    const { successMessage, errorMessage, contextHolder } = useMessages()
+    const { contextHolder } = useMessages()
 
     return (
         <div style={{ margin: 10 }}>
@@ -31,6 +26,7 @@ export default function AddNodeBtn() {
                 >
                     <Tooltip title="Add parent">
                         <Button
+                            className="select-category-modal-openbtn"
                             style={{ width: 40 }}
                             type="primary"
                             onClick={() => {
@@ -42,6 +38,7 @@ export default function AddNodeBtn() {
                     </Tooltip>
                     <Tooltip title="Add child">
                         <Button
+                            className="select-category-modal-openbtn"
                             style={{ width: 40 }}
                             type="primary"
                             onClick={() => {
@@ -54,6 +51,7 @@ export default function AddNodeBtn() {
                 </div>
             ) : (
                 <Button
+                    className="select-category-modal-openbtn"
                     type="primary"
                     onClick={() => {
                         setRelationNewNode(undefined)

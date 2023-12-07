@@ -8,6 +8,7 @@ import { clustersApi } from './clusters.api'
 import { nodesApi } from './nodes.api'
 import { connectionsApi } from './connections.api'
 import { sourcesApi } from './sources.api'
+import { categoriesApi } from './categories.api'
 
 const rootReducer = combineReducers({
     appReducer,
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
     [nodesApi.reducerPath]: nodesApi.reducer,
     [connectionsApi.reducerPath]: connectionsApi.reducer,
     [sourcesApi.reducerPath]: sourcesApi.reducer,
+    [categoriesApi.reducerPath]: categoriesApi.reducer,
 })
 
 export const setupStore = () => {
@@ -34,7 +36,8 @@ export const setupStore = () => {
                 clustersApi.middleware,
                 nodesApi.middleware,
                 connectionsApi.middleware,
-                sourcesApi.middleware
+                sourcesApi.middleware,
+                categoriesApi.middleware
             )
         },
     })

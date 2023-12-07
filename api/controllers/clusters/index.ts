@@ -55,6 +55,16 @@ async function getOneById(
                 .toArray()
         })
 
+        result.categories = db
+            .collection('categories')
+            .find({
+                $or: [
+                    { clusterId: cluster._id.toString() },
+                    { clusterId: null },
+                ],
+            })
+            .toArray()
+
         const promiseResults = await Promise.all(Object.values(result))
 
         const keys = Object.keys(result)
