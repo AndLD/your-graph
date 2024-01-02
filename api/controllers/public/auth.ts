@@ -43,14 +43,14 @@ async function postLogin(req: any, res: Response) {
         active: user.active,
         subscription: user.subscription,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        updatedAt: user.updatedAt
     }
 
     const tokens = createJwt(userState)
 
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true })
     res.json({
-        result: tokens.accessToken,
+        result: tokens.accessToken
     })
 }
 
@@ -92,7 +92,7 @@ async function getRefresh(req: any, res: Response) {
         active: user.active,
         subscription: user.subscription,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        updatedAt: user.updatedAt
     }
 
     const tokens = createJwt(userState)
@@ -109,5 +109,5 @@ async function postLogout(_: any, res: Response) {
 export const authPublicControllers = {
     postLogin: tryCatch(postLogin),
     getRefresh: tryCatch(getRefresh),
-    postLogout: tryCatch(postLogout),
+    postLogout: tryCatch(postLogout)
 }
