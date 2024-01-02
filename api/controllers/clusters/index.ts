@@ -48,6 +48,7 @@ async function getOneById(
 
         const result: any = {}
 
+        console.time('getOneById')
         ;['nodes', 'connections', 'sources'].forEach((component) => {
             result[component] = db
                 .collection(component)
@@ -56,12 +57,90 @@ async function getOneById(
         })
 
         const promiseResults = await Promise.all(Object.values(result))
+        console.timeEnd('getOneById')
 
         const keys = Object.keys(result)
 
         for (let i = 0; i < keys.length; i++) {
             result[keys[i]] = promiseResults[i]
         }
+
+        res.json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
+// TODO Andrii Larionov: Need to test this method and compare performance with getOneById on high load. Probably it would be a good practice to switch getOneById to this method on high load.
+async function getOneById_using_aggregation(
+    req: AuthorizedRequest,
+    res: Response,
+    next: NextFunction
+) {
+    try {
+        const clusterId = req.params.id
+
+        const cluster =
+            req.middlewarePayload?.item ||
+            (await db
+                .collection(collectionName)
+                .findOne({ _id: new ObjectId(clusterId) }))
+
+        if (!cluster) {
+            return res.sendStatus(404)
+        }
+
+        const resultCursor = db.collection('clusters').aggregate([
+            {
+                $lookup: {
+                    from: 'nodes',
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$clusterId', clusterId] }
+                            }
+                        }
+                    ],
+                    as: 'nodes'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'connections',
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$clusterId', clusterId] }
+                            }
+                        }
+                    ],
+                    as: 'connections'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'sources',
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$clusterId', clusterId] }
+                            }
+                        }
+                    ],
+                    as: 'sources'
+                }
+            },
+            {
+                $project: {
+                    nodes: '$nodes',
+                    connections: '$connections',
+                    sources: '$sources',
+                    _id: 0
+                }
+            }
+        ])
+
+        const result = (await resultCursor.toArray())[0]
 
         res.json(result)
     } catch (error) {
@@ -79,7 +158,7 @@ async function post(req: AuthorizedRequest, res: Response, next: NextFunction) {
         const newCluster: IClusterPostBody = {
             title: req.body.title,
             access: req.body.access || 'private',
-            userId,
+            userId
         }
 
         if (req.body.description) {
@@ -103,7 +182,7 @@ async function put(req: AuthorizedRequest, res: Response, next: NextFunction) {
 
         // TODO: Go through all body fields and add them to the updates object after validation
         const updates: IClusterPut = {
-            updatedAt: Date.now(),
+            updatedAt: Date.now()
         }
         if (req.body.title) {
             updates.title = req.body.title
@@ -190,7 +269,8 @@ async function deleteOne(
 export const clustersControllers = {
     getByUserId,
     getOneById,
+    getOneById_using_aggregation,
     post,
     put,
-    deleteOne,
+    deleteOne
 }

@@ -8,6 +8,11 @@ import { quotaNotReached, userHasAccess } from '../../../middlewares/users'
 export const clustersPrivateRouter = Router()
     .get('/', clustersControllers.getByUserId)
     .get('/:id', userHasAccess('clusters'), clustersControllers.getOneById)
+    .get(
+        '/using_aggregation/:id',
+        userHasAccess('clusters'),
+        clustersControllers.getOneById_using_aggregation
+    )
     .post('/', quotaNotReached('clusters'), clustersControllers.post)
     .put('/:id', userHasAccess('clusters'), clustersControllers.put)
     .delete('/:id', userHasAccess('clusters'), clustersControllers.deleteOne)
