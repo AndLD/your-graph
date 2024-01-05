@@ -15,7 +15,6 @@ export default function ClusterRow({ cluster }: IClusterRowProps) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    height: 50,
                     backgroundColor: 'lightgray',
                     borderRadius: 5,
                     marginBottom: 10,

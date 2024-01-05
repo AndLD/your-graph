@@ -29,18 +29,21 @@ export default function SearchContainer() {
 
     useEffect(() => {
         setApplicableKeys(
-            nodes.map((node) => ({
-                id: node.id,
-                title: node.title,
-                tags: node.tags,
-                keys: [
-                    ...(node.title
-                        ? [...node.title.toLowerCase().split(' ')]
-                        : []),
-                    ...(node.tags?.map((tag: string) => tag.toLowerCase()) ||
-                        []),
-                ],
-            }))
+            nodes.map((node) => {
+                return {
+                    id: node.id,
+                    title: node.payload?.title,
+                    tags: node.payload?.tags,
+                    keys: [
+                        ...(node.payload?.title
+                            ? [...node.payload.title.toLowerCase().split(' ')]
+                            : []),
+                        ...(node.payload?.tags?.map((tag: string) =>
+                            tag.toLowerCase()
+                        ) || []),
+                    ],
+                }
+            })
         )
     }, [nodes])
 

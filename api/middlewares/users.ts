@@ -191,7 +191,7 @@ export function quotaNotReached(quotaType: Quota, clusterIdField = 'id') {
             const count = await db
                 .collection(quotaType)
                 .countDocuments({ clusterId })
-            console.log(count)
+
             if (count < freeSubscriptionQuotas[quotaType]) {
                 return next()
             }

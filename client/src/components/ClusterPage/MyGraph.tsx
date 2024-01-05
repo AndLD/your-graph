@@ -1,5 +1,5 @@
 import Graph from 'react-graph-vis'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect } from 'react'
 import { clusterContext } from '../../context'
 import {
     IHoverEvent,
@@ -147,10 +147,10 @@ export default function MyGraph() {
                 id="myGraph"
                 graph={{
                     nodes: nodes.map((node) => {
-                        if (node.title) {
+                        if (node.payload?.title) {
                             node.label = Utils.getNodeLabel(node)
                         }
-                        if (node.image) {
+                        if (node?.image) {
                             node.shape = 'circularImage'
                         }
 
@@ -159,15 +159,18 @@ export default function MyGraph() {
                                 edge.from === node.id || edge.to === node.id
                         )
 
-                        return {
+                        const result = {
                             ...node,
-                            title: node.description,
-                            font: { color: node.color },
-                            border: node.image ? 4 : 2,
-                            size: node.image
+                            image: node.image,
+                            title: node.payload?.description,
+                            color: node.payload?.color,
+                            border: node.payload?.image ? 4 : 2,
+                            size: node.payload?.image
                                 ? 20 + connections.length * 1.5
                                 : 15 + connections.length * 1.5,
                         }
+
+                        return result
                     }),
                     edges,
                 }}

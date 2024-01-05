@@ -23,7 +23,7 @@ export default function Clusters() {
                     isModalOpenState={
                         [isModalOpen, setIsModalOpen] as [
                             boolean,
-                            React.Dispatch<React.SetStateAction<boolean>>
+                            React.Dispatch<React.SetStateAction<boolean>>,
                         ]
                     }
                 />

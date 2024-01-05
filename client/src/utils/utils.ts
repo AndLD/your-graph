@@ -9,15 +9,15 @@ export const Utils = {
     },
     getNodeLabel(node: INode) {
         return (
-            node.title +
-            (node.startDate
+            node.payload.title +
+            (node.payload.startDate
                 ? '\n' +
-                  dayjs(node.startDate, 'DD.MM.YYYY')
+                  dayjs(node.payload.startDate, 'DD.MM.YYYY')
                       .format('DD.MM.YYYY')
                       .toString() +
-                  (node.endDate
+                  (node.payload.endDate
                       ? ' - ' +
-                        dayjs(node.endDate, 'DD.MM.YYYY')
+                        dayjs(node.payload.endDate, 'DD.MM.YYYY')
                             .format('DD.MM.YYYY')
                             .toString()
                       : '')

@@ -9,12 +9,12 @@ type INodePayload = {
     tags?: string[]
     image?: string
     color?: string | { border: string; background: string }
+    sourceIds?: string[]
 } & { [key: string]: Dayjs | string | null }
 
 export interface INodeBackend {
     _id: ID
     payload: INodePayload
-    sourceIds?: string[]
     clusterId: ID
 }
 
@@ -53,7 +53,8 @@ export interface INode {
     group?: string
     shape?: string
     font?: object
-    sourceIds?: string[]
     x?: number
     y?: number
+    image?: string
+    title?: string
 }

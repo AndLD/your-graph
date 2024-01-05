@@ -40,8 +40,8 @@ export default function UpdateNodeForm() {
                         ...rest,
                     }
 
-                    if (updatedNode.image) {
-                        newNode.image = `/images/${selectedNodeId}${updatedNode.image}`
+                    if (updatedNode.payload?.image) {
+                        newNode.payload.image = `/images/${selectedNodeId}${updatedNode.payload.image}`
                     }
 
                     return newNode as INode
@@ -96,17 +96,17 @@ export default function UpdateNodeForm() {
             if (selectedNode) {
                 const newFieldsValue = {
                     id: selectedNode.id,
-                    title: selectedNode.title,
-                    description: selectedNode.description,
-                    color: selectedNode.color,
-                    tags: selectedNode.tags,
-                    startDate: selectedNode.startDate
-                        ? dayjs(selectedNode.startDate, 'DD.MM.YYYY')
+                    title: selectedNode.payload.title,
+                    description: selectedNode.payload.description,
+                    color: selectedNode.payload.color,
+                    tags: selectedNode.payload.tags,
+                    startDate: selectedNode.payload.startDate
+                        ? dayjs(selectedNode.payload.startDate, 'DD.MM.YYYY')
                         : undefined,
-                    endDate: selectedNode.endDate
-                        ? dayjs(selectedNode.endDate, 'DD.MM.YYYY')
+                    endDate: selectedNode.payload.endDate
+                        ? dayjs(selectedNode.payload.endDate, 'DD.MM.YYYY')
                         : undefined,
-                    sourceIds: selectedNode.sourceIds,
+                    sourceIds: selectedNode.payload.sourceIds,
                 }
                 if ((newFieldsValue.color as any)?.toHexString) {
                     newFieldsValue.color = (

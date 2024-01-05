@@ -71,20 +71,8 @@ export default function useClusterContextValue() {
                         ...node,
                     }
 
-                    if (node.payload.image) {
-                        modified.payload.image = `/images/${_id}${node.payload.image}`
-                    }
-                    if (node.payload.startDate) {
-                        modified.payload.startDate = dayjs(
-                            node.payload.startDate,
-                            'DD.MM.YYYY'
-                        )
-                    }
-                    if (node.payload.endDate) {
-                        modified.payload.endDate = dayjs(
-                            node.payload.endDate,
-                            'DD.MM.YYYY'
-                        )
+                    if (node.payload?.image) {
+                        modified.image = `/images/${_id}${node.payload.image}`
                     }
 
                     return modified
