@@ -19,9 +19,7 @@ export default function TitleContainer() {
         }
     }, [hoveredNodeId])
 
-    return hoveredNode?.title ? (
-        <div className="title-container">
-            {hoveredNode && Utils.getNodeLabel(hoveredNode)}
-        </div>
+    return hoveredNode?.label ? (
+        <div className="title-container">{hoveredNode.label}</div>
     ) : null
 }

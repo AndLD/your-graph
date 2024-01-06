@@ -8,18 +8,23 @@ import TitleContainer from '../components/ClusterPage/TitleContainer'
 import SearchContainer from '../components/ClusterPage/SearchContainer'
 import CreateCategoryModal from '../components/ClusterPage/Category/CreateCategoryModal'
 import SelectCategoryModal from '../components/ClusterPage/SelectCategoryModal'
+import BackButton from '../components/ClusterPage/BackButton.tsx'
+import '../styles/Cluster.scss'
 
 export default function Cluster() {
     return (
         <clusterContext.Provider value={useClusterContextValue()}>
-            <SearchContainer />
-            <UpdateNodeFormWrapper />
-            <SelectCategoryModal />
-            <CreateCategoryModal />
-            <ImageContainer />
-            <TitleContainer />
-            <MyGraph />
-            <Controls />
+            <div className="screen-container">
+                <BackButton />
+                <SearchContainer />
+                <UpdateNodeFormWrapper />
+                <SelectCategoryModal />
+                <CreateCategoryModal />
+                <ImageContainer />
+                <TitleContainer />
+                <MyGraph />
+                <Controls />
+            </div>
         </clusterContext.Provider>
     )
 }

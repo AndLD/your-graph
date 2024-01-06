@@ -2,6 +2,8 @@ import ClustersMenu from '../components/ClustersPage/ClustersMenu'
 import { Button } from 'antd'
 import ClusterCreateModal from '../components/ClustersPage/ClusterCreateModal'
 import { useState } from 'react'
+import Title from 'antd/es/typography/Title'
+import '../styles/Clusters.scss'
 
 export default function Clusters() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -11,7 +13,9 @@ export default function Clusters() {
     return (
         <div className="auth-page">
             <div className="auth-card">
-                <h1>Clusters Menu</h1>
+                <Title level={2} style={{ textAlign: 'center' }}>
+                    Clusters Menu
+                </Title>
                 <ClustersMenu />
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Button type="primary" onClick={showModal}>

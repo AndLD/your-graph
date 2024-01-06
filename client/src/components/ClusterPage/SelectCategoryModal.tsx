@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useEffect, useContext, useRef } from 'react'
 import { Button, Modal } from 'antd'
 import { clusterContext } from '../../context'
 import Title from 'antd/es/typography/Title'
@@ -19,26 +19,26 @@ export default function SelectCategoryModal() {
         categoriesState: [categories],
     } = useContext(clusterContext)
 
-    const [action, setAction] = useState<((param?: any) => any) | null>(null)
+    const action = useRef<((param?: any) => any) | null>(null)
 
     const postNode = usePostNode((id) => {
         successMessage()
-        setAction(() => {
+        action.current = () => {
             selectNode(id)
-        })
+        }
     })
 
     useEffect(() => {
-        if (action) {
-            action()
-            setAction(null)
+        if (action.current) {
+            action.current()
+            action.current = null
         }
     }, [nodes])
 
     const { successMessage } = useMessages()
 
-    function createNode() {
-        postNode(relationNewNode)
+    function createNode(categoryId?: string) {
+        postNode(relationNewNode, categoryId)
         setIsSelectCategoryModalVisible(false)
         setRelationNewNode(undefined)
     }
@@ -78,7 +78,13 @@ export default function SelectCategoryModal() {
                     <Title level={3}>Choose category</Title>
                 </div>
 
-                <div style={{ height: '400px' }}>
+                <div
+                    style={{
+                        height: 400,
+                        maxHeight: 400,
+                        overflowY: 'scroll',
+                    }}
+                >
                     <div
                         style={{
                             width: '300px',
@@ -86,6 +92,7 @@ export default function SelectCategoryModal() {
                             flexWrap: 'wrap',
                             rowGap: '15px',
                             columnGap: '45px',
+                            paddingTop: 10,
                         }}
                     >
                         {categories &&
@@ -100,25 +107,28 @@ export default function SelectCategoryModal() {
                                     <div
                                         style={{
                                             backgroundColor: '#eeeeee',
-                                            width: '70px',
-                                            height: '70px',
+                                            width: '64px',
+                                            height: '64px',
                                             borderRadius: '50%',
+                                            cursor: 'pointer',
                                         }}
-                                        onClick={createNode}
+                                        onClick={() => createNode(category.id)}
                                     />
-                                    {category.title}
+                                    <div style={{ marginTop: 5 }}>
+                                        {category.title}
+                                    </div>
                                 </div>
                             ))}
                         <div
                             style={{
-                                width: '70px',
-                                height: '88px',
+                                width: '64px',
+                                height: '64px',
                                 display: 'flex',
                                 alignItems: 'start',
                             }}
                         >
                             <Button
-                                style={{ width: '70px', height: '70px' }}
+                                style={{ width: '64px', height: '64px' }}
                                 shape="circle"
                                 icon={
                                     <PlusOutlined
@@ -130,6 +140,10 @@ export default function SelectCategoryModal() {
                         </div>
                     </div>
                 </div>
+
+                <Button onClick={() => createNode()}>
+                    Create Default Node
+                </Button>
             </div>
         </Modal>
     )

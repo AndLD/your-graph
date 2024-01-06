@@ -7,7 +7,14 @@ export default function ClustersMenu() {
     const [clusters, setClusters] = useContext(clustersContext).clustersState
 
     return (
-        <div style={{ minHeight: 300, maxHeight: '50vh', overflowY: 'scroll' }}>
+        <div
+            style={{
+                minHeight: 300,
+                maxHeight: '50vh',
+                overflowY: 'scroll',
+                padding: 30,
+            }}
+        >
             {clusters.length ? (
                 clusters.map((cluster) => (
                     <ClusterRow cluster={cluster} key={cluster._id} />

@@ -14,6 +14,7 @@ import {
     useDeleteConnection,
     usePostConnection,
 } from '../store/connections.api'
+import { Utils } from '../../utils/utils.ts'
 
 export default function useClusterContextValue() {
     const navigate = useNavigate()
@@ -78,24 +79,9 @@ export default function useClusterContextValue() {
                     return modified
                 })
             )
-            edgesState[1](
-                data.connections.map(({ _id, ...rest }) => ({
-                    id: _id,
-                    ...rest,
-                }))
-            )
-            sourcesState[1](
-                data.sources.map(({ _id, ...rest }) => ({
-                    id: _id,
-                    ...rest,
-                }))
-            )
-            categoriesState[1](
-                data.categories.map(({ _id, ...rest }) => ({
-                    id: _id,
-                    ...rest,
-                }))
-            )
+            edgesState[1](Utils.renameIdKeyForItems(data.connections))
+            sourcesState[1](Utils.renameIdKeyForItems(data.sources))
+            categoriesState[1](Utils.renameIdKeyForItems(data.categories))
         })
     } else {
         navigate('/clusters')

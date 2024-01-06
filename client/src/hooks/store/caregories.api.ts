@@ -23,7 +23,6 @@ export function usePostCategory(callback?: (newSourceId: string) => void) {
             body,
         }).then((response: any) => {
             const category = response.data
-            console.log('category: ', category)
             setCategories([...categories, category])
             if (callback) callback(category.id)
         })

@@ -1,5 +1,5 @@
 import { ID } from '../types'
-import { ICategory, ICategoryBackend } from './categories'
+import { ICategoryBackend } from './categories'
 import { IConnectionBackend } from './connections'
 import { INodeBackend } from './nodes'
 import { ISourceBackend } from './sources'

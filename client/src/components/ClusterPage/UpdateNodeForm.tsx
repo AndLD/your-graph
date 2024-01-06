@@ -96,17 +96,17 @@ export default function UpdateNodeForm() {
             if (selectedNode) {
                 const newFieldsValue = {
                     id: selectedNode.id,
-                    title: selectedNode.payload.title,
-                    description: selectedNode.payload.description,
-                    color: selectedNode.payload.color,
-                    tags: selectedNode.payload.tags,
-                    startDate: selectedNode.payload.startDate
+                    title: selectedNode.payload?.title,
+                    description: selectedNode.payload?.description,
+                    color: selectedNode.payload?.color,
+                    tags: selectedNode.payload?.tags,
+                    startDate: selectedNode.payload?.startDate
                         ? dayjs(selectedNode.payload.startDate, 'DD.MM.YYYY')
                         : undefined,
-                    endDate: selectedNode.payload.endDate
+                    endDate: selectedNode.payload?.endDate
                         ? dayjs(selectedNode.payload.endDate, 'DD.MM.YYYY')
                         : undefined,
-                    sourceIds: selectedNode.payload.sourceIds,
+                    sourceIds: selectedNode.payload?.sourceIds,
                 }
                 if ((newFieldsValue.color as any)?.toHexString) {
                     newFieldsValue.color = (

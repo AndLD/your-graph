@@ -11,11 +11,11 @@ export default function ClusterRow({ cluster }: IClusterRowProps) {
     return (
         <div>
             <div
+                className="highlight-on-hover"
                 style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    backgroundColor: 'lightgray',
                     borderRadius: 5,
                     marginBottom: 10,
                     padding: 10,

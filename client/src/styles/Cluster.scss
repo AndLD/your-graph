@@ -1,0 +1,14 @@
+/* Define keyframes for the animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Apply the animation to the screen container */
+.screen-container {
+  animation: fadeIn 1s ease-in-out; /* You can adjust the duration and easing function as needed */
+}

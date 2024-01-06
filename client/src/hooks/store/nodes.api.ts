@@ -49,7 +49,7 @@ export function usePostNode(callback: (id: string) => void) {
         edgesState: [edges, setEdges],
     } = useContext(clusterContext)
 
-    return (type?: 'child' | 'parent') => {
+    return (type?: 'child' | 'parent', categoryId?: string) => {
         if (!clusterId) {
             return
         }
@@ -68,6 +68,10 @@ export function usePostNode(callback: (id: string) => void) {
             }
         }
 
+        if (categoryId) {
+            body.categoryId = categoryId
+        }
+
         postNodeMutation({
             clusterId,
             selectedNodeId: selectedNodeId || undefined,
@@ -80,9 +84,9 @@ export function usePostNode(callback: (id: string) => void) {
                 // Update the nodesState by adding the new node
                 setNodes([...nodes, { id: nodeId, ...rest }])
 
+                const thisRest = rest
                 if (selectedNodeId) {
                     const { _id: connectionId, ...rest } = value.data.connection
-
                     setEdges([...edges, { id: connectionId, ...rest }])
                 }
 

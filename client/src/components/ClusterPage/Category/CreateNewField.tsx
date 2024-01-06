@@ -3,8 +3,10 @@ import { useContext } from 'react'
 import { clusterContext } from '../../../context'
 
 const options = [
-    { value: 'Text', label: 'Text' },
-    { value: 'Date', label: 'Date' },
+    { value: 'title', label: 'Title' },
+    { value: 'text', label: 'Text' },
+    { value: 'textArea', label: 'Text Area' },
+    { value: 'date', label: 'Date' },
 ]
 
 export default function CreateNewField({ index }: { index: number }) {
@@ -17,7 +19,10 @@ export default function CreateNewField({ index }: { index: number }) {
     }
 
     function handleDeleteField() {
-        const newFields = fieldsForCategory.filter((_, i) => i !== index)
+        const fieldIndex = findFieldIndex()
+        const newFields = fieldsForCategory.filter((_, i) => {
+            return i !== fieldIndex
+        })
         setFieldsForCategory(newFields)
     }
 
@@ -50,6 +55,7 @@ export default function CreateNewField({ index }: { index: number }) {
     return (
         <div style={{ display: 'flex' }}>
             <Input
+                value={fieldsForCategory[index].label}
                 onChange={handleChangeInput}
                 placeholder="Label"
                 style={{ marginBottom: '5px', marginRight: '3px' }}

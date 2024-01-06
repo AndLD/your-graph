@@ -8,9 +8,13 @@ export const Utils = {
         return Math.round(rand)
     },
     getNodeLabel(node: INode) {
+        if (!node.payload) {
+            return null
+        }
+
         return (
-            node.payload.title +
-            (node.payload.startDate
+            node.payload?.title +
+            (node.payload?.startDate
                 ? '\n' +
                   dayjs(node.payload.startDate, 'DD.MM.YYYY')
                       .format('DD.MM.YYYY')
@@ -23,5 +27,11 @@ export const Utils = {
                       : '')
                 : '')
         )
+    },
+    renameIdKeyForItems(items: any[]) {
+        return items.map(({ _id, ...rest }) => ({
+            id: _id,
+            ...rest,
+        }))
     },
 }

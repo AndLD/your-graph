@@ -148,7 +148,10 @@ export default function MyGraph() {
                 graph={{
                     nodes: nodes.map((node) => {
                         if (node.payload?.title) {
-                            node.label = Utils.getNodeLabel(node)
+                            const label = Utils.getNodeLabel(node)
+                            if (label) {
+                                node.label = label
+                            }
                         }
                         if (node?.image) {
                             node.shape = 'circularImage'

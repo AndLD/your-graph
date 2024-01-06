@@ -58,7 +58,7 @@ async function post(req: Request, res: Response, next: NextFunction) {
             }
 
             if (selectedNodeId) {
-                const connection =
+                const connection: any =
                     type === 'child'
                         ? {
                               from: selectedNodeId,
@@ -68,6 +68,8 @@ async function post(req: Request, res: Response, next: NextFunction) {
                               from: result.insertedId.toString(),
                               to: selectedNodeId,
                           }
+
+                connection.clusterId = clusterId
 
                 result = await db
                     .collection('connections')

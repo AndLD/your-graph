@@ -38,10 +38,12 @@ export default function CreateCategoryModal() {
     }, [fieldsForCategory])
 
     const optionsForCategory: CheckboxOptionType[] = [
-        { label: 'Color field', value: 'color' },
-        { label: 'Image field', value: 'image' },
-        { label: 'Source filed', value: 'source' },
+        { label: 'Color', value: 'color' },
+        { label: 'Start Date', value: 'startDate' },
+        { label: 'End Date', value: 'endDate' },
         { label: 'Tags', value: 'tags' },
+        { label: 'Image', value: 'image' },
+        { label: 'Source', value: 'source' },
     ]
 
     function onChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -145,7 +147,7 @@ export default function CreateCategoryModal() {
                             onClick={handleCreateNewField}
                             style={{ marginBottom: '5px' }}
                         >
-                            Add filed
+                            Add one
                         </Button>
                     </div>
                 )}
